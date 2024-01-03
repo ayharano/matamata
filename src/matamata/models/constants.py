@@ -1,1 +1,3 @@
 COMPETITOR_LABEL_CONSTRAINT = 'competitor_label_not_empty_nor_whitespace_only'
+TOURNAMENT_LABEL_CONSTRAINT = 'tournament_label_not_empty_nor_whitespace_only'
+TOURNAMENT_START_ATTRS_CONSTRAINT = 'tournament_matchesCreation_competitors_startingRound_must_be_all_null_or_all_set_under_conditions'

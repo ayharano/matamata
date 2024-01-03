@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import factory
 
-from matamata.models import Competitor
+from matamata.models import Competitor, Tournament
 
 
 class TimestampedFactory(factory.Factory):
@@ -15,3 +15,13 @@ class CompetitorFactory(TimestampedFactory):
         model = Competitor
 
     label = factory.Faker('name')
+
+
+class TournamentFactory(TimestampedFactory):
+    class Meta:
+        model = Tournament
+
+    label = factory.Faker('company')
+    matchesCreation = None
+    numberCompetitors = None
+    startingRound = None
