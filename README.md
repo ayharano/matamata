@@ -17,6 +17,7 @@ with a descriptive [`index.md file`](./docs/index.md).
 
 # Project Dependencies
 - [Python](https://www.python.org/) 3.12+
+- [uvicorn](https://www.uvicorn.org/) 0.25+
 - [FastAPI](https://fastapi.tiangolo.com/) 0.108+
 - [Pydantic Settings](https://docs.pydantic.dev/2.5/concepts/pydantic_settings/) 2.1
 
