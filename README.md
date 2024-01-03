@@ -11,3 +11,6 @@ single-elimination tournament management with features as
 creating new tournaments, registering competitors,
 retrieving the matches lists, win-lose management, and
 other actions.
+
+Documentation for this project are stored in [`docs`](./docs) directory
+with a descriptive [`index.md file`](./docs/index.md).
