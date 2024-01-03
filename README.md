@@ -23,3 +23,14 @@ with a descriptive [`index.md file`](./docs/index.md).
 ## Test Dependencies
 - [pytest](https://docs.pytest.org/) 7.4
 - [pytest-cov](https://pytest-cov.readthedocs.io/) 4.1
+
+# Project Configuration
+This project uses [the twelve-factor app](https://12factor.net/) methodology.
+
+Environment variables in this project can be stored using a `.env` (dot env) file.
+For initial setup, a sample is provided as [`.env.sample`](.env.sample).
+If you prefer to use a `.env` file, copy that sample as `.env` and modify the values accordingly.
+
+A description of each of the variables is provided as the following list.
+
+<EMPTY FOR NOW>
