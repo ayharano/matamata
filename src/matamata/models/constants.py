@@ -1,0 +1,1 @@
+COMPETITOR_LABEL_CONSTRAINT = 'competitor_label_not_empty_nor_whitespace_only'
