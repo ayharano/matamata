@@ -2,12 +2,13 @@ from datetime import datetime
 
 from sqlalchemy import CheckConstraint, String, inspect
 from sqlalchemy.event import listens_for
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import generic_repr
 
 from .base import IdUuidTimestampedBase
 from .constants import TOURNAMENT_LABEL_CONSTRAINT, TOURNAMENT_START_ATTRS_CONSTRAINT
 from .exceptions import CannotUpdateTournamentDataAfterStartError
+from .tournament_competitor import TournamentCompetitor
 
 
 SET_AFTER_START_ATTRS = {'matchesCreation', 'numberCompetitors', 'startingRound'}
@@ -42,6 +43,13 @@ class Tournament(IdUuidTimestampedBase):
     numberCompetitors: Mapped[int | None] = mapped_column()
     startingRound: Mapped[int | None] = mapped_column()
 
+    competitors: Mapped[list['Competitor']] = relationship(
+        secondary=TournamentCompetitor.__table__,
+        back_populates='tournaments',
+    )
+    competitor_associations: Mapped[list[TournamentCompetitor]] = relationship(
+        back_populates='tournament',
+    )
 
 @listens_for(Tournament, 'before_update')
 def prevent_tournament_update_after_start(mapper, connection, target):

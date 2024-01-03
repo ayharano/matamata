@@ -7,6 +7,7 @@ from matamata.database import get_session
 from matamata.main import app
 from matamata.models import Base
 from matamata.settings import settings
+from tests.models.factories import CompetitorFactory, TournamentFactory
 
 
 @pytest.fixture
@@ -41,3 +42,31 @@ def client(session):
         yield client
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def competitor(session):
+    competitor = CompetitorFactory()
+    session.add(competitor)
+    session.commit()
+    session.refresh(competitor)
+
+    return competitor
+
+
+competitor1 = competitor
+competitor2 = competitor
+
+
+@pytest.fixture
+def tournament(session):
+    tournament = TournamentFactory()
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    return tournament
+
+
+tournament1 = tournament
+tournament2 = tournament

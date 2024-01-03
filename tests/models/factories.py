@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import factory
 
-from matamata.models import Competitor, Tournament
+from matamata.models import Competitor, Tournament, TournamentCompetitor
 
 
 class TimestampedFactory(factory.Factory):
@@ -25,3 +25,11 @@ class TournamentFactory(TimestampedFactory):
     matchesCreation = None
     numberCompetitors = None
     startingRound = None
+
+
+class TournamentCompetitorFactory(TimestampedFactory):
+    class Meta:
+        model = TournamentCompetitor
+
+    tournament = factory.SubFactory(TournamentFactory)
+    competitor = factory.SubFactory(CompetitorFactory)
