@@ -32,6 +32,7 @@ dependencies = [
 test = [
     "pytest >=7.4.4,<7.5",
     "pytest-cov >=4.1.0,<4.2",
+    "factory-boy >=3.3.0,<3.4",
 ]
 
 [tool.pytest.ini_options]

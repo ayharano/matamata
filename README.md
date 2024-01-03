@@ -28,6 +28,7 @@ with a descriptive [`index.md file`](./docs/index.md).
 ## Test Dependencies
 - [pytest](https://docs.pytest.org/) 7.4
 - [pytest-cov](https://pytest-cov.readthedocs.io/) 4.1
+- [factory_boy](https://factoryboy.readthedocs.io/) 3.3
 
 # Project Configuration
 This project uses [the twelve-factor app](https://12factor.net/) methodology.
