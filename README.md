@@ -17,6 +17,7 @@ with a descriptive [`index.md file`](./docs/index.md).
 
 # Project Dependencies
 - [Python](https://www.python.org/) 3.12+
+- [FastAPI](https://fastapi.tiangolo.com/) 0.108+
 
 ## Test Dependencies
 - [pytest](https://docs.pytest.org/) 7.4
