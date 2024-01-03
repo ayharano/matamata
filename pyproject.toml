@@ -19,3 +19,18 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/ayharano/matamata"
 "Bug Tracker" = "https://github.com/ayharano/matamata/issues"
+
+[project.optional-dependencies]
+test = [
+    "pytest >=7.4.4,<7.5",
+    "pytest-cov >=4.1.0,<4.2",
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = [
+    "tests",
+]
+pythonpath = [
+    "src",
+]

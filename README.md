@@ -17,3 +17,7 @@ with a descriptive [`index.md file`](./docs/index.md).
 
 # Project Dependencies
 - [Python](https://www.python.org/) 3.12+
+
+## Test Dependencies
+- [pytest](https://docs.pytest.org/) 7.4
+- [pytest-cov](https://pytest-cov.readthedocs.io/) 4.1
