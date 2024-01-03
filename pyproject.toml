@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "matamata"
+dynamic = ["version"]
 authors = [
   { name="Alexandre Harano", email="email@ayharano.dev" },
 ]
@@ -37,3 +38,6 @@ testpaths = [
 pythonpath = [
     "src",
 ]
+
+[tool.setuptools.dynamic]
+version = {file = "matamata/VERSION"}
