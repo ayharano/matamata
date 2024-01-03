@@ -21,6 +21,9 @@ with a descriptive [`index.md file`](./docs/index.md).
 - [FastAPI](https://fastapi.tiangolo.com/) 0.108+
 - [Pydantic Settings](https://docs.pydantic.dev/2.5/concepts/pydantic_settings/) 2.1
 
+## Database Dependencies
+- [SQLAlchemy](https://docs.sqlalchemy.org/en/20/) 2.0
+
 ## Test Dependencies
 - [pytest](https://docs.pytest.org/) 7.4
 - [pytest-cov](https://pytest-cov.readthedocs.io/) 4.1
