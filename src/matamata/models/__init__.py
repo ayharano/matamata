@@ -1,1 +1,1 @@
-from .base import Base, TimestampedBase
+from .base import Base, TimestampedBase, IdUuidBase, IdUuidTimestampedBase
