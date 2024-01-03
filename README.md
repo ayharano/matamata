@@ -14,3 +14,6 @@ other actions.
 
 Documentation for this project are stored in [`docs`](./docs) directory
 with a descriptive [`index.md file`](./docs/index.md).
+
+# Project Dependencies
+- [Python](https://www.python.org/) 3.12+
