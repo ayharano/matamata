@@ -37,4 +37,4 @@ If you prefer to use a `.env` file, copy that sample as `.env` and modify the va
 
 A description of each of the variables is provided as the following list.
 
-<EMPTY FOR NOW>
+- `DATABASE_URL`: a string value to be used as an [Engine Configuration](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls) URL
