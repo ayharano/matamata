@@ -51,6 +51,9 @@ class Tournament(IdUuidTimestampedBase):
         back_populates='tournament',
     )
 
+    matches: Mapped[list['Match']] = relationship(back_populates='tournament')
+
+
 @listens_for(Tournament, 'before_update')
 def prevent_tournament_update_after_start(mapper, connection, target):
     inspected_target = inspect(target)
