@@ -20,6 +20,22 @@ TrimmedString = Annotated[str, AfterValidator(strip_string)]
 NonEmptyTrimmedString = Annotated[TrimmedString, AfterValidator(non_empty_trimmed_string)]
 
 
+def non_negative(value: int) -> int:
+    if value < 0:
+        raise ValueError('must not a non-negative value')
+    return value
+
+
+def positive(value: int) -> int:
+    if value <= 0:
+        raise ValueError('must not a positive value')
+    return value
+
+
+NonNegativeInt = Annotated[int, AfterValidator(non_negative)]
+PositiveInt = Annotated[int, AfterValidator(positive)]
+
+
 class LabelSchema(BaseModel):
     label: NonEmptyTrimmedString
 
@@ -34,3 +50,55 @@ class TournamentCompetitorPayloadSchema(BaseModel):
 
 class WinnerPayloadSchema(BaseModel):
     winner_uuid: UUID
+
+
+class UuidLabelSchema(BaseModel):
+    uuid: UUID
+    label: NonEmptyTrimmedString
+
+
+TournamentSchema = UuidLabelSchema
+CompetitorSchema = UuidLabelSchema
+
+
+class TournamentCompetitorSchema(BaseModel):
+    tournament: TournamentSchema
+    competitor: CompetitorSchema
+
+
+class TournamentAfterStartSchema(UuidLabelSchema):
+    startingRound: NonNegativeInt
+    competitors: PositiveInt
+
+
+class MatchSchemaForTournamentListing(BaseModel):
+    uuid: UUID
+    round: NonNegativeInt
+    position: NonNegativeInt
+    previousMatchX_uuid: UUID | None
+    previousMatchY_uuid: UUID | None
+    competitorA: CompetitorSchema | None
+    competitorB: CompetitorSchema | None
+    winner: CompetitorSchema | None
+    loser: CompetitorSchema | None
+
+
+class TournamentStartSchema(BaseModel):
+    tournament: TournamentAfterStartSchema
+    competitors: list[CompetitorSchema]
+    matches: list[MatchSchemaForTournamentListing]
+
+
+class TournamentMatchesSchema(BaseModel):
+    tournament: TournamentAfterStartSchema
+    past: list[MatchSchemaForTournamentListing]
+    upcoming: list[MatchSchemaForTournamentListing]
+
+
+class MatchSchema(MatchSchemaForTournamentListing):
+    tournament: TournamentAfterStartSchema
+
+
+class TournamentResultSchema(BaseModel):
+    tournament: TournamentAfterStartSchema
+    top4: list[CompetitorSchema | None]
