@@ -6,6 +6,8 @@ Date: 2024-01-02
 
 Proposed
 
+Partially superceded by [5. Removing redundant data relationship](0005-removing-redundant-data-relationship.md)
+
 ## Context
 
 After [the definition of ubiquitous language and the rules that the system will obey](0002-defining-ubiquitous-language.md),
