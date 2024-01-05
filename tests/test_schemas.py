@@ -143,8 +143,6 @@ def test_tournament_start_schema():
                     'uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
                     'round': 1,
                     'position': 0,
-                    'previousMatchX_uuid': None,
-                    'previousMatchY_uuid': None,
                     'competitorA': {
                         'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                         'label': 'Germany'
@@ -160,8 +158,6 @@ def test_tournament_start_schema():
                     'uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'round': 1,
                     'position': 1,
-                    'previousMatchX_uuid': None,
-                    'previousMatchY_uuid': None,
                     'competitorA': {
                         'uuid': '7f026276-0904-4a7b-ae14-8c66b95ffc9e',
                         'label': 'Brazil'
@@ -175,8 +171,6 @@ def test_tournament_start_schema():
                 },
                 {
                     'uuid': '1f1fc156-4382-427c-aefb-5ae10009b7ce',
-                    'previousMatchX_uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
-                    'previousMatchY_uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'round': 0,
                     'position': 0,
                     'competitorA': None,
@@ -186,8 +180,6 @@ def test_tournament_start_schema():
                 },
                 {
                     'uuid': 'a9367a16-3f64-408b-9596-4029f7f60e62',
-                    'previousMatchX_uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
-                    'previousMatchY_uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'round': 0,
                     'position': 1,
                     'competitorA': None,
@@ -219,8 +211,6 @@ def test_tournament_matches_schema():
                     'uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
                     'round': 1,
                     'position': 0,
-                    'previousMatchX_uuid': None,
-                    'previousMatchY_uuid': None,
                     'competitorA': {
                         'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                         'label': 'Germany'
@@ -242,8 +232,6 @@ def test_tournament_matches_schema():
                     'uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'round': 1,
                     'position': 1,
-                    'previousMatchX_uuid': None,
-                    'previousMatchY_uuid': None,
                     'competitorA': {
                         'uuid': '7f026276-0904-4a7b-ae14-8c66b95ffc9e',
                         'label': 'Brazil'
@@ -265,8 +253,6 @@ def test_tournament_matches_schema():
                     'uuid': 'a9367a16-3f64-408b-9596-4029f7f60e62',
                     'round': 0,
                     'position': 1,
-                    'previousMatchX_uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
-                    'previousMatchY_uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'competitorA': {
                         'uuid': '5d1bd1d1-2679-432a-ac11-ebfebfa1bce9',
                         'label': 'South Korea'
@@ -290,8 +276,6 @@ def test_tournament_matches_schema():
                     'uuid': '1f1fc156-4382-427c-aefb-5ae10009b7ce',
                     'round': 0,
                     'position': 0,
-                    'previousMatchX_uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
-                    'previousMatchY_uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'competitorA': {
                         'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                         'label': 'Germany'
@@ -325,8 +309,6 @@ def test_match_schema():
             },
             'round': 0,
             'position': 0,
-            'previousMatchX_uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
-            'previousMatchY_uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
             'competitorA': {
                 'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                 'label': 'Germany'
@@ -350,8 +332,6 @@ def test_match_schema():
     assert schema.round >= 0
     assert isinstance(schema.position, int)
     assert schema.position >= 0
-    assert isinstance(schema.previousMatchX_uuid, uuid.UUID | None)
-    assert isinstance(schema.previousMatchY_uuid, uuid.UUID | None)
     assert isinstance(schema.competitorA, CompetitorSchema | None)
     assert isinstance(schema.competitorB, CompetitorSchema | None)
     assert isinstance(schema.winner, CompetitorSchema | None)

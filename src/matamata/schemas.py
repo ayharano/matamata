@@ -75,8 +75,6 @@ class MatchSchemaForTournamentListing(BaseModel):
     uuid: UUID
     round: NonNegativeInt
     position: NonNegativeInt
-    previousMatchX_uuid: UUID | None
-    previousMatchY_uuid: UUID | None
     competitorA: CompetitorSchema | None
     competitorB: CompetitorSchema | None
     winner: CompetitorSchema | None
