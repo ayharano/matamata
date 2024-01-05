@@ -6,10 +6,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
 from matamata.database import get_session
-from matamata.models import Competitor, Tournament, TournamentCompetitor
+from matamata.models import Competitor, Match, Tournament, TournamentCompetitor
 from matamata.schemas import (
     TournamentCompetitorPayloadSchema,
     TournamentCompetitorSchema,
+    TournamentMatchesSchema,
     TournamentPayloadSchema,
     TournamentSchema,
     TournamentStartSchema,
@@ -127,6 +128,61 @@ def start_tournament(
         'tournament': tournament,
         'competitors': tournament.competitors,
         'matches': matches,
+    }
+
+    return data
+
+
+@router.get('/{tournament_uuid}/match', response_model=TournamentMatchesSchema, status_code=200)
+def list_tournament_matches(
+    tournament_uuid: UUID,
+    session: Session = Depends(get_session),
+):
+    tournament = session.scalar(
+        select(Tournament)
+        .where(Tournament.uuid == tournament_uuid)
+    )
+
+    if not tournament:
+        raise HTTPException(status_code=404, detail='Target Tournament does not exist')
+
+    if not tournament.matchesCreation:
+        raise HTTPException(
+            status_code=422,
+            detail='Target Tournament has not created its matches yet',
+        )
+
+    base_match_query = (
+        select(Match)
+        .where(Match.tournament_id == tournament.id)
+        .order_by(
+            Match.round.desc(),
+            Match.position.asc(),
+        )
+    )
+
+    past_matches_query = (
+        base_match_query
+        .where(
+            Match.resultRegistration.is_not(None),
+            Match.winner_id.is_not(None),
+        )
+    )
+    upcoming_matches_query = (
+        base_match_query
+        .where(
+            Match.resultRegistration.is_(None),
+            Match.winner_id.is_(None),
+        )
+    )
+
+    past_matches = session.scalars(past_matches_query).all()
+    upcoming_matches = session.scalars(upcoming_matches_query).all()
+
+    data = {
+        'tournament': tournament,
+        'past': past_matches,
+        'upcoming': upcoming_matches,
     }
 
     return data
