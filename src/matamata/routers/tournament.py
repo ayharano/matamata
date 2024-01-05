@@ -12,6 +12,7 @@ from matamata.schemas import (
     TournamentCompetitorSchema,
     TournamentMatchesSchema,
     TournamentPayloadSchema,
+    TournamentResultSchema,
     TournamentSchema,
     TournamentStartSchema,
 )
@@ -183,6 +184,68 @@ def list_tournament_matches(
         'tournament': tournament,
         'past': past_matches,
         'upcoming': upcoming_matches,
+    }
+
+    return data
+
+
+@router.get('/{tournament_uuid}/result', response_model=TournamentResultSchema, status_code=200)
+def get_tournament_top4(
+    tournament_uuid: UUID,
+    session: Session = Depends(get_session),
+):
+    tournament = session.scalar(
+        select(Tournament)
+        .where(Tournament.uuid == tournament_uuid)
+    )
+
+    if not tournament:
+        raise HTTPException(status_code=404, detail='Target Tournament does not exist')
+
+    if not tournament.matchesCreation:
+        raise HTTPException(
+            status_code=422,
+            detail='Target Tournament has not created its matches yet',
+        )
+
+    round0_matches = session.scalars(
+        select(Match)
+        .where(
+            Match.tournament_id == tournament.id,
+            Match.round == 0,
+            Match.resultRegistration.is_not(None),
+        )
+        .options(
+            joinedload(Match.winner),
+            joinedload(Match.loser),
+        )
+        .order_by(
+            Match.position.asc(),
+        )
+    ).all()
+
+    top4 = [None, None, None, None]
+    if tournament.numberCompetitors <= 2:
+        if len(round0_matches) != 1:
+            raise HTTPException(
+                status_code=422,
+                detail='Target Tournament is not ready to display the top 4 competitors',
+            )
+    else:
+        if len(round0_matches) != 2:
+            raise HTTPException(
+                status_code=422,
+                detail='Target Tournament is not ready to display the top 4 competitors',
+            )
+        top4[2] = round0_matches[1].winner
+        top4[3] = round0_matches[1].loser
+
+    top4[0] = round0_matches[0].winner
+    top4[1] = round0_matches[0].loser
+
+    data = {
+        'tournament': tournament,
+        'top4': top4,
     }
 
     return data

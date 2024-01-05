@@ -568,3 +568,418 @@ def test_422_for_missing_competitor_during_list_tournament_matches(session, clie
     assert response.json() == {
         'detail': 'Target Tournament has not created its matches yet',
     }
+
+
+GET_TOURNAMENT_TOP4_URL_TEMPLATE = BASE_URL + '/{tournament_uuid}/result'
+
+
+def test_200_for_get_tournament_top4_for_one_competitor(session, client, tournament, competitor):
+    tournament.competitors.append(competitor)
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    client.post(
+        START_TOURNAMENT_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    # Then we retrieve the matches
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    response_json = response.json()
+
+    assert response.status_code == 200
+    assert len(response_json['top4']) == 4
+    assert response.json() == {
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+            'startingRound': 0,
+            'numberCompetitors': 1,
+        },
+        'top4': [
+            {
+                'uuid': str(competitor.uuid),
+                'label': competitor.label,
+            },
+            None,
+            None,
+            None,
+        ],
+    }
+
+
+REGISTER_MATCH_RESULT_URL_TEMPLATE = '/match/{match_uuid}'
+
+
+def test_200_for_get_tournament_top4_for_two_competitors(
+    session, client, tournament, competitor1, competitor2,
+):
+    map_uuid_to_competitor = {}
+    for competitor_ in [competitor1, competitor2]:
+        tournament.competitors.append(competitor_)
+        map_uuid_to_competitor[str(competitor_.uuid)] = competitor_
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    response_start = client.post(
+        START_TOURNAMENT_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    response_start_json = response_start.json()
+    json_final = response_start_json['matches'][0]
+
+    assert json_final['round'] == 0
+    assert json_final['position'] == 0
+    assert json_final['winner'] is None
+    assert json_final['loser'] is None
+    assert json_final['competitorA'] is not None
+    assert json_final['competitorB'] is not None
+
+    second_place_uuid = json_final['competitorA']['uuid']
+    second_place = map_uuid_to_competitor[second_place_uuid]
+    first_place_uuid = json_final['competitorB']['uuid']
+    first_place = map_uuid_to_competitor[first_place_uuid]
+
+    # Then we register the final match result
+    client.post(
+        REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=json_final['uuid']),
+        json={
+            'winner_uuid': first_place_uuid,
+        },
+    )
+
+    # Then we retrieve the results
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    response_json = response.json()
+
+    assert response.status_code == 200
+    assert len(response_json['top4']) == 4
+    assert response.json() == {
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+            'startingRound': 0,
+            'numberCompetitors': 2,
+        },
+        'top4': [
+            {
+                'uuid': first_place_uuid,
+                'label': first_place.label,
+            },
+            {
+                'uuid': second_place_uuid,
+                'label': second_place.label,
+            },
+            None,
+            None,
+        ],
+    }
+
+
+def test_200_for_get_tournament_top4_for_three_competitors(
+    session, client, tournament, competitor1, competitor2, competitor3,
+):
+    map_uuid_to_competitor = {}
+    for competitor_ in [competitor1, competitor2, competitor3]:
+        tournament.competitors.append(competitor_)
+        map_uuid_to_competitor[str(competitor_.uuid)] = competitor_
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    response_start = client.post(
+        START_TOURNAMENT_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    response_start_json = response_start.json()
+    json_semifinal = response_start_json['matches'][0]
+    json_final = response_start_json['matches'][2]
+
+    first_place_uuid = response_start_json['matches'][1]['winner']['uuid']
+    first_place = map_uuid_to_competitor[first_place_uuid]
+
+    assert json_semifinal['round'] == 1
+    assert json_semifinal['position'] == 0
+    assert json_semifinal['winner'] is None
+    assert json_semifinal['loser'] is None
+    assert json_semifinal['competitorA'] is not None
+    assert json_semifinal['competitorB'] is not None
+
+    assert json_final['round'] == 0
+    assert json_final['position'] == 0
+    assert json_final['winner'] is None
+    assert json_final['loser'] is None
+    assert json_final['competitorA'] is None
+    assert json_final['competitorB'] is not None
+
+    third_place_uuid = json_semifinal['competitorA']['uuid']
+    third_place = map_uuid_to_competitor[third_place_uuid]
+    second_place_uuid = json_semifinal['competitorB']['uuid']
+    second_place = map_uuid_to_competitor[second_place_uuid]
+
+    # Then we register the semifinal match result
+    client.post(
+        REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=json_semifinal['uuid']),
+        json={
+            'winner_uuid': second_place_uuid,
+        },
+    )
+
+    # Then we register the final match result
+    client.post(
+        REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=json_final['uuid']),
+        json={
+            'winner_uuid': first_place_uuid,
+        },
+    )
+
+    # Then we retrieve the results
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    response_json = response.json()
+
+    assert response.status_code == 200
+    assert len(response_json['top4']) == 4
+    assert response.json() == {
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+            'startingRound': 1,
+            'numberCompetitors': 3,
+        },
+        'top4': [
+            {
+                'uuid': first_place_uuid,
+                'label': first_place.label,
+            },
+            {
+                'uuid': second_place_uuid,
+                'label': second_place.label,
+            },
+            {
+                'uuid': third_place_uuid,
+                'label': third_place.label,
+            },
+            None,
+        ],
+    }
+
+
+def test_200_for_get_tournament_top4_for_four_competitors(
+    session, client, tournament, competitor1, competitor2, competitor3, competitor4,
+):
+    map_uuid_to_competitor = {}
+    for competitor_ in [competitor1, competitor2, competitor3, competitor4]:
+        tournament.competitors.append(competitor_)
+        map_uuid_to_competitor[str(competitor_.uuid)] = competitor_
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    response_start = client.post(
+        START_TOURNAMENT_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    response_start_json = response_start.json()
+    json_semifinal0 = response_start_json['matches'][0]
+    json_semifinal1 = response_start_json['matches'][1]
+    json_final = response_start_json['matches'][2]
+    json_third_place_match = response_start_json['matches'][3]
+
+    assert json_semifinal0['round'] == 1
+    assert json_semifinal0['position'] == 0
+    assert json_semifinal0['winner'] is None
+    assert json_semifinal0['loser'] is None
+    assert json_semifinal0['competitorA'] is not None
+    assert json_semifinal0['competitorB'] is not None
+
+    assert json_semifinal1['round'] == 1
+    assert json_semifinal1['position'] == 1
+    assert json_semifinal1['winner'] is None
+    assert json_semifinal1['loser'] is None
+    assert json_semifinal1['competitorA'] is not None
+    assert json_semifinal1['competitorB'] is not None
+
+    assert json_final['round'] == 0
+    assert json_final['position'] == 0
+    assert json_final['winner'] is None
+    assert json_final['loser'] is None
+    assert json_final['competitorA'] is None
+    assert json_final['competitorB'] is None
+
+    assert json_third_place_match['round'] == 0
+    assert json_third_place_match['position'] == 1
+    assert json_third_place_match['winner'] is None
+    assert json_third_place_match['loser'] is None
+    assert json_third_place_match['competitorA'] is None
+    assert json_third_place_match['competitorB'] is None
+
+    third_place_uuid = json_semifinal0['competitorA']['uuid']
+    third_place = map_uuid_to_competitor[third_place_uuid]
+    second_place_uuid = json_semifinal0['competitorB']['uuid']
+    second_place = map_uuid_to_competitor[second_place_uuid]
+
+    # Then we register the semifinal0 match result
+    client.post(
+        REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=json_semifinal0['uuid']),
+        json={
+            'winner_uuid': second_place_uuid,
+        },
+    )
+
+    fourth_place_uuid = json_semifinal1['competitorA']['uuid']
+    fourth_place = map_uuid_to_competitor[fourth_place_uuid]
+    first_place_uuid = json_semifinal1['competitorB']['uuid']
+    first_place = map_uuid_to_competitor[first_place_uuid]
+
+    # Then we register the semifinal1 match result
+    client.post(
+        REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=json_semifinal1['uuid']),
+        json={
+            'winner_uuid': first_place_uuid,
+        },
+    )
+
+    # Then we register the third place match result
+    client.post(
+        REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=json_third_place_match['uuid']),
+        json={
+            'winner_uuid': third_place_uuid,
+        },
+    )
+
+    # Then we register the final match result
+    client.post(
+        REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=json_final['uuid']),
+        json={
+            'winner_uuid': first_place_uuid,
+        },
+    )
+
+    # Then we retrieve the results
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    response_json = response.json()
+
+    assert response.status_code == 200
+    assert len(response_json['top4']) == 4
+    assert response.json() == {
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+            'startingRound': 1,
+            'numberCompetitors': 4,
+        },
+        'top4': [
+            {
+                'uuid': first_place_uuid,
+                'label': first_place.label,
+            },
+            {
+                'uuid': second_place_uuid,
+                'label': second_place.label,
+            },
+            {
+                'uuid': third_place_uuid,
+                'label': third_place.label,
+            },
+            {
+                'uuid': fourth_place_uuid,
+                'label': fourth_place.label,
+            },
+        ],
+    }
+
+
+def test_404_for_missing_tournament_during_get_tournament_top4(client):
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(
+            tournament_uuid='01234567-89ab-cdef-0123-456789abcdef',
+        ),
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        'detail': 'Target Tournament does not exist',
+    }
+
+
+def test_422_for_missing_competitor_during_get_tournament_top4(session, client, tournament, competitor):
+    tournament.competitors.append(competitor)
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': 'Target Tournament has not created its matches yet',
+    }
+
+
+def test_422_for_final_not_played_during_get_tournament_for_two_competitors(
+    session, client, tournament, competitor1, competitor2,
+):
+    for competitor_ in [competitor1, competitor2]:
+        tournament.competitors.append(competitor_)
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    client.post(
+        START_TOURNAMENT_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    # Then we retrieve the results
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': 'Target Tournament is not ready to display the top 4 competitors',
+    }
+
+
+def test_422_for_final_not_played_during_get_tournament_for_three_competitors(
+    session, client, tournament, competitor1, competitor2, competitor3,
+):
+    for competitor_ in [competitor1, competitor2, competitor3]:
+        tournament.competitors.append(competitor_)
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    client.post(
+        START_TOURNAMENT_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    # Then we retrieve the results
+    response = client.get(
+        GET_TOURNAMENT_TOP4_URL_TEMPLATE.format(tournament_uuid=tournament.uuid),
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': 'Target Tournament is not ready to display the top 4 competitors',
+    }
