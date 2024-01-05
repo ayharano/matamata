@@ -15,6 +15,10 @@ other actions.
 Documentation for this project are stored in [`docs`](./docs) directory
 with a descriptive [`index.md file`](./docs/index.md).
 
+While running the project, it is possible to access the interactive OpenAPI documentation.
+
+![OpenAPI Interactive Page Screenshot](docs/openapi.png "Interactive OpenAPI page")
+
 # Project Dependencies
 - [Python](https://www.python.org/) 3.12+
 - [uvicorn](https://www.uvicorn.org/) 0.25+
