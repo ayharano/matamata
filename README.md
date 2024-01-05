@@ -24,6 +24,7 @@ with a descriptive [`index.md file`](./docs/index.md).
 ## Database Dependencies
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/20/) 2.0
 - [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/) 0.41
+- [Alembic](https://alembic.sqlalchemy.org/) 1.13
 
 ## Test Dependencies
 - [pytest](https://docs.pytest.org/) 7.4
