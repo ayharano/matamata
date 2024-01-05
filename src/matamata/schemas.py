@@ -68,7 +68,7 @@ class TournamentCompetitorSchema(BaseModel):
 
 class TournamentAfterStartSchema(UuidLabelSchema):
     startingRound: NonNegativeInt
-    competitors: PositiveInt
+    numberCompetitors: PositiveInt
 
 
 class MatchSchemaForTournamentListing(BaseModel):

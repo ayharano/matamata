@@ -118,7 +118,7 @@ def test_tournament_start_schema():
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
                 'startingRound': 1,
-                'competitors': 4
+                'numberCompetitors': 4
             },
             'competitors': [
                 {
@@ -204,7 +204,7 @@ def test_tournament_matches_schema():
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
                 'startingRound': 1,
-                'competitors': 4
+                'numberCompetitors': 4
             },
             'past': [
                 {
@@ -305,7 +305,7 @@ def test_match_schema():
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
                 'startingRound': 1,
-                'competitors': 4
+                'numberCompetitors': 4
             },
             'round': 0,
             'position': 0,
@@ -345,7 +345,7 @@ def test_tournament_result_schema():
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
                 'startingRound': 1,
-                'competitors': 4
+                'numberCompetitors': 4
             },
             'top4': [
                 {
