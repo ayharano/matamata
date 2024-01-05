@@ -1,156 +1,24 @@
-# 4. REST API Endpoints
+# 6. Removing Previous Match UUID Data
 
-Date: 2024-01-02
+Date: 2024-01-05
 
 ## Status
 
 Proposed
 
-Partially superceded by [6. Removing previous match UUID data](0006-removing-previous-match-uuid-data.md)
+Partially supercedes [4. REST API Endpoints](0004-rest-api-endpoints.md)
 
 ## Context
 
-We defined [the ubiquitous language and the rules that the system will obey](0002-defining-ubiquitous-language.md)
-and most of [the system data modeling](0003-data-modeling.md).
+As we chose to [remove some redundant data relationship](0005-removing-redundant-data-relationship.md),
+some endpoints schemas need to be updated. This is a document to provide the changes in the updated endpoints.
 
-We need to define the interface that the system will make available for the
-[User](0002-defining-ubiquitous-language.md#user)
-interaction.
+Another change related to naming conflict is that the `competitors` attribute to represent the number of competitors
+registered in a tournament is replaced with `numberCompetitors`.
 
-This document contains a non-exhaustive list of methods and endpoints that will be available for
-a user to interact with the [single-elimination tournament](https://en.wikipedia.org/wiki/Single-elimination_tournament) management system.
+Besides the schema changes, there is a missing error condition that we also include in this document.
 
 ## Decision
-
-While we defined several fields for database tables in [the system data modeling](0003-data-modeling.md),
-for the external input and output schemas some fields may be calculated or omitted during the user interaction.
-
-For this document, we are using [JSON schema](https://json-schema.org/) with examples to display
-the expected payload and results. The tournament used as an example is
-[the 2002 FIFA World Cup](https://en.wikipedia.org/wiki/2002_FIFA_World_Cup),
-starting from the semi-finals, to keep the examples short.
-
-### POST `/competitor`
-Create a *Competitor* without any *Tournament* registration and return the *Competitor* data.
-
-#### Payload
-JSON schema:
-```json
-{
-  "title": "payloadPostCompetitor",
-  "type": "object",
-  "required": ["label"],
-  "properties": {
-    "label": {
-      "type": "string",
-      "description": "Competitor textual representation"
-    }
-  }
-}
-```
-
-`label` is a textual data to represent a competitor. Its uniqueness isn't enforced by the system.
-
-##### Example
-JSON:
-```json
-{
-  "label": "South Korea"
-}
-```
-
-#### Successful output
-Status code: 201 Created
-
-JSON schema:
-```json
-{
-  "title": "responsePostCompetitor",
-  "type": "object",
-  "required": ["uuid", "label"],
-  "properties": {
-    "uuid": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Competitor identifier"
-    },
-    "label": {
-      "type": "string",
-      "description": "Competitor textual representation"
-    }
-  }
-}
-```
-
-##### Example
-JSON:
-```json
-{
-  "uuid": "5d1bd1d1-2679-432a-ac11-ebfebfa1bce9",
-  "label": "South Korea"
-}
-```
-
-
-### POST `/tournament`
-Create a *Tournament* without any *Competitor* registration and return the *Tournament* data.
-
-#### Payload
-JSON schema:
-```json
-{
-  "title": "payloadPostTournament",
-  "type": "object",
-  "required": ["label"],
-  "properties": {
-    "label": {
-      "type": "string",
-      "description": "Tournament textual representation"
-    }
-  }
-}
-```
-
-`label` is a textual data to represent a tournament. Its uniqueness isn't enforced by the system.
-
-##### Example
-```json
-{
-  "label": "2002 FIFA World Cup"
-}
-```
-
-#### Successful output
-Status code: 201 Created
-
-JSON schema:
-```json
-{
-  "title": "responsePostTournament",
-  "type": "object",
-  "required": ["uuid", "label"],
-  "properties": {
-    "uuid": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Tournament identifier"
-    },
-    "label": {
-      "type": "string",
-      "description": "Tournament textual representation"
-    }
-  }
-}
-```
-
-##### Example
-```json
-{
-  "uuid": "03c964f8-7f5c-4224-b848-1ab6c1413c7d",
-  "label": "2002 FIFA World Cup"
-}
-```
-
 
 ### POST `/tournament/<tournament_uuid>/competitor`
 Register a *Competitor* into a *Tournament* and return the *Tournament*-*Competitor* association data.
@@ -273,6 +141,7 @@ JSON schema:
 This endpoint might fail for one of the listed reasons:
 - Target *Competitor* does not exist (status code: 404 Not Found)
 - Target *Tournament* does not exist (status code: 404 Not Found)
+- Target *Competitor* is already registered in target *Tournament* (status code: 409 Conflict)
 - Target *Tournament* has already created its matches and does not allow new *Competitor*s registration (status code: 409 Conflict)
 
 
@@ -280,9 +149,7 @@ This endpoint might fail for one of the listed reasons:
 Start a *Tournament* by closing its *Competitor*s registration, calculating all *Match*es and
 return the *Tournament*, the *Competitor*s, and all of its *Match*es data.
 
-The entry *Match*es will be randomly generated but each of them will have at least one *Competitor*,
-while all the intermediate *Match*es will have their `previousMatchX_uuid` and `previousMatchY_uuid`
-properly populated with non-`null` values.
+The entry *Match*es will be randomly generated but each of them will have at least one *Competitor*.
 
 If there are entry *Match*es with only one *Competitor*, the next round's match will be filled with
 the same *Competitor* reference, being the same as an automatic winning.
@@ -321,7 +188,7 @@ JSON schema:
   "$defs": {
     "tournament": {
       "type": "object",
-      "required": ["uuid", "label", "startingRound", "competitors"],
+      "required": ["uuid", "label", "startingRound", "numberCompetitors"],
       "properties": {
         "uuid": {
           "type": "string",
@@ -336,7 +203,7 @@ JSON schema:
           "type": "integer",
           "minimum": 0
         },
-        "competitors": {
+        "numberCompetitors": {
           "type": "integer",
           "minimum": 1
         }
@@ -363,8 +230,6 @@ JSON schema:
         "uuid",
         "round",
         "position",
-        "previousMatchX_uuid",
-        "previousMatchY_uuid",
         "competitorA",
         "competitorB",
         "winner",
@@ -383,16 +248,6 @@ JSON schema:
         "position": {
           "type": "integer",
           "minimum": 0
-        },
-        "previousMatchX_uuid": {
-          "type": ["string", "null"],
-          "format": "uuid",
-          "description": "Previous Match X identifier"
-        },
-        "previousMatchY_uuid": {
-          "type": ["string", "null"],
-          "format": "uuid",
-          "description": "Previous Match Y identifier"
         },
         "competitorA": {
           "oneOf": [
@@ -431,7 +286,7 @@ JSON schema:
     "uuid": "03c964f8-7f5c-4224-b848-1ab6c1413c7d",
     "label": "2002 FIFA World Cup",
     "startingRound": 1,
-    "competitors": 4
+    "numberCompetitors": 4
   },
   "competitors": [
     {
@@ -456,8 +311,6 @@ JSON schema:
       "uuid": "1e172084-ec76-4f56-bd8e-7b3c170e1221",
       "round": 1,
       "position": 0,
-      "previousMatchX_uuid": null,
-      "previousMatchY_uuid": null,
       "competitorA": {
         "uuid": "de686e37-804b-4815-a507-d5879a240af6",
         "label": "Germany"
@@ -473,8 +326,6 @@ JSON schema:
       "uuid": "3866cad6-ba40-44fb-96c6-09f1131c5649",
       "round": 1,
       "position": 1,
-      "previousMatchX_uuid": null,
-      "previousMatchY_uuid": null,
       "competitorA": {
         "uuid": "7f026276-0904-4a7b-ae14-8c66b95ffc9e",
         "label": "Brazil"
@@ -488,8 +339,6 @@ JSON schema:
     },
     {
       "uuid": "1f1fc156-4382-427c-aefb-5ae10009b7ce",
-      "previousMatchX_uuid": "1e172084-ec76-4f56-bd8e-7b3c170e1221",
-      "previousMatchY_uuid": "3866cad6-ba40-44fb-96c6-09f1131c5649",
       "round": 0,
       "position": 0,
       "competitorA": null,
@@ -499,8 +348,6 @@ JSON schema:
     },
     {
       "uuid": "a9367a16-3f64-408b-9596-4029f7f60e62",
-      "previousMatchX_uuid": "1e172084-ec76-4f56-bd8e-7b3c170e1221",
-      "previousMatchY_uuid": "3866cad6-ba40-44fb-96c6-09f1131c5649",
       "round": 0,
       "position": 1,
       "competitorA": null,
@@ -570,7 +417,7 @@ JSON schema:
   "$defs": {
     "tournament": {
       "type": "object",
-      "required": ["uuid", "label", "startingRound", "competitors"],
+      "required": ["uuid", "label", "startingRound", "numberCompetitors"],
       "properties": {
         "uuid": {
           "type": "string",
@@ -585,7 +432,7 @@ JSON schema:
           "type": "integer",
           "minimum": 0
         },
-        "competitors": {
+        "numberCompetitors": {
           "type": "integer",
           "minimum": 1
         }
@@ -612,8 +459,6 @@ JSON schema:
         "uuid",
         "round",
         "position",
-        "previousMatchX_uuid",
-        "previousMatchY_uuid",
         "competitorA",
         "competitorB",
         "winner",
@@ -632,16 +477,6 @@ JSON schema:
         "position": {
           "type": "integer",
           "minimum": 0
-        },
-        "previousMatchX_uuid": {
-          "type": ["string", "null"],
-          "format": "uuid",
-          "description": "Previous Match X identifier"
-        },
-        "previousMatchY_uuid": {
-          "type": ["string", "null"],
-          "format": "uuid",
-          "description": "Previous Match Y identifier"
         },
         "competitorA": {
           "oneOf": [
@@ -680,15 +515,13 @@ JSON schema:
     "uuid": "03c964f8-7f5c-4224-b848-1ab6c1413c7d",
     "label": "2002 FIFA World Cup",
     "startingRound": 1,
-    "competitors": 4
+    "numberCompetitors": 4
   },
   "past": [
     {
       "uuid": "1e172084-ec76-4f56-bd8e-7b3c170e1221",
       "round": 1,
       "position": 0,
-      "previousMatchX_uuid": null,
-      "previousMatchY_uuid": null,
       "competitorA": {
         "uuid": "de686e37-804b-4815-a507-d5879a240af6",
         "label": "Germany"
@@ -710,8 +543,6 @@ JSON schema:
       "uuid": "3866cad6-ba40-44fb-96c6-09f1131c5649",
       "round": 1,
       "position": 1,
-      "previousMatchX_uuid": null,
-      "previousMatchY_uuid": null,
       "competitorA": {
         "uuid": "7f026276-0904-4a7b-ae14-8c66b95ffc9e",
         "label": "Brazil"
@@ -733,8 +564,6 @@ JSON schema:
       "uuid": "a9367a16-3f64-408b-9596-4029f7f60e62",
       "round": 0,
       "position": 1,
-      "previousMatchX_uuid": "1e172084-ec76-4f56-bd8e-7b3c170e1221",
-      "previousMatchY_uuid": "3866cad6-ba40-44fb-96c6-09f1131c5649",
       "competitorA": {
         "uuid": "5d1bd1d1-2679-432a-ac11-ebfebfa1bce9",
         "label": "South Korea"
@@ -758,8 +587,6 @@ JSON schema:
       "uuid": "1f1fc156-4382-427c-aefb-5ae10009b7ce",
       "round": 0,
       "position": 0,
-      "previousMatchX_uuid": "1e172084-ec76-4f56-bd8e-7b3c170e1221",
-      "previousMatchY_uuid": "3866cad6-ba40-44fb-96c6-09f1131c5649",
       "competitorA": {
         "uuid": "de686e37-804b-4815-a507-d5879a240af6",
         "label": "Germany"
@@ -839,8 +666,6 @@ JSON schema:
     "tournament",
     "round",
     "position",
-    "previousMatchX_uuid",
-    "previousMatchY_uuid",
     "competitorA",
     "competitorB",
     "winner",
@@ -863,16 +688,6 @@ JSON schema:
       "type": "integer",
       "minimum": 0
     },
-    "previousMatchX_uuid": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Previous Match X identifier"
-    },
-    "previousMatchY_uuid": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Previous Match Y identifier"
-    },
     "competitorA": {
       "$ref": "#/$defs/competitor"
     },
@@ -889,7 +704,7 @@ JSON schema:
   "$defs": {
     "tournament": {
       "type": "object",
-      "required": ["uuid", "label", "startingRound", "competitors"],
+      "required": ["uuid", "label", "startingRound", "numberCompetitors"],
       "properties": {
         "uuid": {
           "type": "string",
@@ -904,7 +719,7 @@ JSON schema:
           "type": "integer",
           "minimum": 0
         },
-        "competitors": {
+        "numberCompetitors": {
           "type": "integer",
           "minimum": 1
         }
@@ -940,12 +755,10 @@ JSON schema:
     "uuid": "03c964f8-7f5c-4224-b848-1ab6c1413c7d",
     "label": "2002 FIFA World Cup",
     "startingRound": 1,
-    "competitors": 4
+    "numberCompetitors": 4
   },
   "round": 0,
   "position": 0,
-  "previousMatchX_uuid": "1e172084-ec76-4f56-bd8e-7b3c170e1221",
-  "previousMatchY_uuid": "3866cad6-ba40-44fb-96c6-09f1131c5649",
   "competitorA": {
     "uuid": "de686e37-804b-4815-a507-d5879a240af6",
     "label": "Germany"
@@ -988,6 +801,8 @@ This endpoint might fail for one of the listed reasons:
 - Target *Match* is not ready to register a result due to registered previous *Match*es but missing *Competitor* (status code: 422 Unprocessable Content)
 
 
+
+
 ### GET `/tournament/<tournament_uuid>/result`
 List the top 4 competitors of the target tournament if possible.
 The competitors are listed as [final winner, final loser, third place winner, third place loser].
@@ -1024,7 +839,7 @@ JSON schema:
   "$defs": {
     "tournament": {
       "type": "object",
-      "required": ["uuid", "label", "startingRound", "competitors"],
+      "required": ["uuid", "label", "startingRound", "numberCompetitors"],
       "properties": {
         "uuid": {
           "type": "string",
@@ -1039,7 +854,7 @@ JSON schema:
           "type": "integer",
           "minimum": 0
         },
-        "competitors": {
+        "numberCompetitors": {
           "type": "integer",
           "minimum": 1
         }
@@ -1071,7 +886,7 @@ JSON schema:
     "uuid": "03c964f8-7f5c-4224-b848-1ab6c1413c7d",
     "label": "2002 FIFA World Cup",
     "startingRound": 1,
-    "competitors": 4
+    "numberCompetitors": 4
   },
   "top4": [
     {
@@ -1117,14 +932,6 @@ This endpoint might fail for one of the listed reasons:
 - Target *Tournament* is not ready to display the top 4 competitors (status code: 422 Unprocessable Content)
 
 
-### To be defined later
-
-The proposed endpoints do not handle some common REST API structures,
-such as pagination or the DELETE method.
-If these or other modifications are necessary, they should be discussed in a future ADR.
-
 ## Consequences
 
-Defining all the minimum required methods and endpoints allow us to
-see whether we could potentially miss needed mechanisms for
-a fully operational management system.
+With the changes in the schema, we make it more straightforward to serialize data from the database.
