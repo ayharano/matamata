@@ -51,6 +51,9 @@ def competitor(session):
 
 competitor1 = competitor
 competitor2 = competitor
+competitor3 = competitor
+competitor4 = competitor
+competitor5 = competitor
 
 
 @pytest.fixture
