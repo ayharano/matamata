@@ -1,1 +1,2 @@
+from .register_match_result import register_match_result
 from .start_tournament import start_tournament
