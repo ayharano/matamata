@@ -19,3 +19,22 @@ def test_create_competitor(client):
         'uuid': response_uuid,
         'label': 'South Korea',
     }
+
+
+def test_list_competitors(client, competitor1, competitor2, competitor3, competitor4, competitor5):
+    expected_data = {
+        'competitors': [
+            {
+                'uuid': str(competitor.uuid),
+                'label': str(competitor.label),
+            }
+            for competitor in [competitor1, competitor2, competitor3, competitor4, competitor5]
+        ],
+    }
+
+    response = client.get(
+        BASE_URL,
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected_data

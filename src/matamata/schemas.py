@@ -61,6 +61,10 @@ TournamentSchema = UuidLabelSchema
 CompetitorSchema = UuidLabelSchema
 
 
+class CompetitorListSchema(BaseModel):
+    competitors: list[CompetitorSchema]
+
+
 class TournamentCompetitorSchema(BaseModel):
     tournament: TournamentSchema
     competitor: CompetitorSchema

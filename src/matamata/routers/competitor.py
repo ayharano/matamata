@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from matamata.database import get_session
 from matamata.models import Competitor
-from matamata.schemas import CompetitorPayloadSchema, CompetitorSchema
+from matamata.schemas import CompetitorPayloadSchema, CompetitorListSchema, CompetitorSchema
 
 
 router = APIRouter(prefix='/competitor', tags=['competitor'])
@@ -22,3 +23,18 @@ def create_competitor(
     session.refresh(competitor)
 
     return competitor
+
+
+@router.get('/', response_model=CompetitorListSchema, status_code=200)
+def list_competitors(
+    session: Session = Depends(get_session),
+):
+    competitors = session.scalars(
+        select(Competitor)
+    ).all()
+
+    data = {
+        'competitors': competitors,
+    }
+
+    return data
