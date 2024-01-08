@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from sqlalchemy import CheckConstraint, String
+from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import generic_repr
 
@@ -19,10 +22,16 @@ class Competitor(IdUuidTimestampedBase):
 
     label: Mapped[str] = mapped_column(String(255))
 
-    tournaments: Mapped[list['Tournament']] = relationship(
-        secondary=TournamentCompetitor.__table__,
-        back_populates='competitors',
-    )
     tournament_associations: Mapped[list[TournamentCompetitor]] = relationship(
-        back_populates='competitor',
+        cascade='all, delete-orphan',
+        overlaps='competitor',
+    )
+    tournaments: AssociationProxy[list['Tournament']] = association_proxy(
+        'tournament_associations',
+        'tournament',
+        creator=lambda tournament_: TournamentCompetitor(tournament=tournament_),
+    )
+    next_matches: AssociationProxy[list['Match']] = association_proxy(
+        'tournament_associations',
+        'next_match',
     )

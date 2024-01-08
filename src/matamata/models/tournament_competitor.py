@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 
 from sqlalchemy import ForeignKey
@@ -15,6 +17,6 @@ class TournamentCompetitor(TimestampedBase):
     competitor_id: Mapped[int] = mapped_column(ForeignKey('competitor.id'), primary_key=True)
     next_match_id: Mapped[int | None] = mapped_column(ForeignKey('match.id'))
 
-    tournament: Mapped['Tournament'] = relationship(back_populates="competitor_associations")
-    competitor: Mapped['Competitor'] = relationship(back_populates="tournament_associations")
+    tournament: Mapped['Tournament'] = relationship()
+    competitor: Mapped['Competitor'] = relationship()
     next_match: Mapped[Optional['Match']] = relationship()

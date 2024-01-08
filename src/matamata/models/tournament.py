@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import CheckConstraint, String, inspect
 from sqlalchemy.event import listens_for
+from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import generic_repr
 
@@ -23,17 +24,17 @@ class Tournament(IdUuidTimestampedBase):
             name=TOURNAMENT_LABEL_CONSTRAINT,
         ),
         CheckConstraint(
-            "("
-            " matchesCreation IS NULL"
-            " AND numberCompetitors IS NULL"
-            " AND startingRound IS NULL"
-            ") OR ("
-            " matchesCreation IS NOT NULL"
-            " AND numberCompetitors IS NOT NULL"
-            " AND startingRound IS NOT NULL"
-            " AND numberCompetitors >= 1"
-            " AND startingRound >= 0"
-            ")",
+            '('
+            ' matchesCreation IS NULL'
+            ' AND numberCompetitors IS NULL'
+            ' AND startingRound IS NULL'
+            ') OR ('
+            ' matchesCreation IS NOT NULL'
+            ' AND numberCompetitors IS NOT NULL'
+            ' AND startingRound IS NOT NULL'
+            ' AND numberCompetitors >= 1'
+            ' AND startingRound >= 0'
+            ')',
             name=TOURNAMENT_START_ATTRS_CONSTRAINT,
         ),
     )
@@ -43,15 +44,22 @@ class Tournament(IdUuidTimestampedBase):
     numberCompetitors: Mapped[int | None] = mapped_column()
     startingRound: Mapped[int | None] = mapped_column()
 
-    competitors: Mapped[list['Competitor']] = relationship(
-        secondary=TournamentCompetitor.__table__,
-        back_populates='tournaments',
-    )
-    competitor_associations: Mapped[list[TournamentCompetitor]] = relationship(
-        back_populates='tournament',
-    )
-
     matches: Mapped[list['Match']] = relationship(back_populates='tournament')
+
+    competitor_associations: Mapped[list[TournamentCompetitor]] = relationship(
+        cascade='all, delete-orphan',
+        overlaps='tournament',
+    )
+    competitors: AssociationProxy[list['Competitor']] = association_proxy(
+        'competitor_associations',
+        'competitor',
+        creator=lambda competitor_: TournamentCompetitor(competitor=competitor_),
+    )
+    # column-targeted association proxy
+    next_matches: AssociationProxy[list['Match']] = association_proxy(
+        'competitor_associations',
+        'next_match',
+    )
 
 
 @listens_for(Tournament, 'before_update')
