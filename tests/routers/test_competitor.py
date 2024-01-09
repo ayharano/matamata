@@ -1,30 +1,7 @@
-from uuid import UUID
-
-from sqlalchemy import select
-from sqlalchemy.orm import Session, joinedload
-
-from matamata.models import Tournament, TournamentCompetitor
-from matamata.services import start_tournament as start_tournament_service
+from tests.utils import start_tournament_util
 
 
 BASE_URL = '/competitor'
-
-
-def retrieve_tournament_with_competitors(
-    *,
-    tournament_uuid: UUID,
-    session: Session,
-) -> Tournament:
-    tournament = session.scalar(
-        select(Tournament)
-        .where(Tournament.uuid == tournament_uuid)
-        .options(
-            joinedload(Tournament.competitor_associations)
-            .subqueryload(TournamentCompetitor.competitor)
-        )
-    )
-
-    return tournament
 
 
 def test_create_competitor(client):
@@ -51,10 +28,10 @@ def test_list_competitors(client, competitor1, competitor2, competitor3, competi
     expected_data = {
         'competitors': [
             {
-                'uuid': str(competitor.uuid),
-                'label': competitor.label,
+                'uuid': str(competitor_.uuid),
+                'label': competitor_.label,
             }
-            for competitor in [competitor1, competitor2, competitor3, competitor4, competitor5]
+            for competitor_ in [competitor1, competitor2, competitor3, competitor4, competitor5]
         ],
     }
 
@@ -91,26 +68,14 @@ def test_200_get_competitor_detail_for_competitor_in_past_ongoing_upcoming_tourn
     session.refresh(tournament3)
 
     # start tournament1 with one competitor
-    tournament1 = retrieve_tournament_with_competitors(
+    tournament1, _ = start_tournament_util(
         tournament_uuid=tournament1.uuid,
         session=session,
     )
 
-    start_tournament_service(
-        tournament=tournament1,
-        competitor_associations=tournament1.competitor_associations,
-        session=session,
-    )
-
     # start tournament2 with two competitor2
-    tournament2 = retrieve_tournament_with_competitors(
+    tournament2, _ = start_tournament_util(
         tournament_uuid=tournament2.uuid,
-        session=session,
-    )
-
-    start_tournament_service(
-        tournament=tournament2,
-        competitor_associations=tournament2.competitor_associations,
         session=session,
     )
 
@@ -172,14 +137,8 @@ def test_200_get_competitor_detail_for_competitor_in_a_past_tournament(session, 
     session.commit()
     session.refresh(competitor)
 
-    tournament = retrieve_tournament_with_competitors(
+    tournament, _ = start_tournament_util(
         tournament_uuid=tournament.uuid,
-        session=session,
-    )
-
-    start_tournament_service(
-        tournament=tournament,
-        competitor_associations=tournament.competitor_associations,
         session=session,
     )
 
@@ -215,14 +174,8 @@ def test_200_get_competitor_detail_for_competitor_in_an_ongoing_tournament(sessi
     session.refresh(competitor1)
     session.refresh(competitor2)
 
-    tournament = retrieve_tournament_with_competitors(
+    tournament, _ = start_tournament_util(
         tournament_uuid=tournament.uuid,
-        session=session,
-    )
-
-    start_tournament_service(
-        tournament=tournament,
-        competitor_associations=tournament.competitor_associations,
         session=session,
     )
 

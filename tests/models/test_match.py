@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import pytest
-from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
 from matamata.models import Match
@@ -11,6 +10,9 @@ from matamata.models.constants import (
     MATCH_ROUND_POSITION_CONSTRAINT,
     MATCH_NON_NULL_COMPETITORS_CANNOT_BE_THE_SAME,
     MATCH_RESULT_REGISTRATION_MUST_REGISTER_A_WINNER,
+)
+from tests.utils import (
+    retrieve_match_with_competitors_by_tournament_round_position,
 )
 
 
@@ -26,13 +28,11 @@ def test_create_and_retrieve_match(session, tournament, competitor1, competitor2
     session.add(new_match)
     session.commit()
 
-    match = session.scalar(
-        select(Match)
-        .where(
-            Match.tournament == tournament,
-            Match.round == 0,
-            Match.position == 0,
-        )
+    match = retrieve_match_with_competitors_by_tournament_round_position(
+        tournament_id=tournament.id,
+        round_=0,
+        position=0,
+        session=session,
     )
 
     assert match.created > before_new_match
