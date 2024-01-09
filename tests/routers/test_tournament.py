@@ -44,6 +44,7 @@ def test_list_tournaments(client, tournament1, tournament2, tournament3):
 
 
 REGISTER_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE = BASE_URL + '/{tournament_uuid}/competitor'
+LIST_COMPETITORS_IN_TOURNAMENT_URL_TEMPLATE = BASE_URL + '/{tournament_uuid}/competitor'
 
 
 def test_201_for_register_competitor_in_tournament(client, tournament, competitor):
@@ -135,6 +136,53 @@ def test_409_for_already_registered_competitor_during_register_competitor_in_tou
     assert response.status_code == 409
     assert response.json() == {
         'detail': 'Target Competitor is already registered in target Tournament',
+    }
+
+
+def test_list_competitors_in_tournament(
+    session, client, tournament, competitor1, competitor2, competitor3, competitor4, competitor5,
+):
+    competitor_list = [competitor1, competitor2, competitor3, competitor4, competitor5]
+    for competitor_ in competitor_list:
+        tournament.competitors.append(competitor_)
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    expected_data = {
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+        },
+        'competitors': [
+            {
+                'uuid': str(competitor_.uuid),
+                'label': competitor_.label,
+            }
+            for competitor_ in competitor_list
+        ],
+    }
+
+    response = client.get(
+        LIST_COMPETITORS_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid=tournament.uuid,
+        ),
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected_data
+
+
+def test_404_for_missing_tournament_during_list_competitors_in_tournament(client):
+    response = client.get(
+        LIST_COMPETITORS_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid='01234567-89ab-cdef-0123-456789abcdef',
+        ),
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        'detail': 'Target Tournament does not exist',
     }
 
 

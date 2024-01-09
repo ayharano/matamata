@@ -85,6 +85,10 @@ class TournamentCompetitorSchema(BaseModel):
     competitor: CompetitorSchema
 
 
+class TournamentCompetitorListSchema(CompetitorListSchema):
+    tournament: TournamentSchema
+
+
 class TournamentAfterStartSchema(UuidLabelSchema):
     startingRound: NonNegativeInt
     numberCompetitors: PositiveInt

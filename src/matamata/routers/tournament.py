@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, joinedload
 from matamata.database import get_session
 from matamata.models import Competitor, Match, Tournament, TournamentCompetitor
 from matamata.schemas import (
+    TournamentCompetitorListSchema,
     TournamentCompetitorPayloadSchema,
     TournamentCompetitorSchema,
     TournamentListSchema,
@@ -98,6 +99,40 @@ def register_competitor_in_tournament(
     session.refresh(tournament_competitor)
 
     return tournament_competitor
+
+
+@router.get(
+    '/{tournament_uuid}/competitor',
+    response_model=TournamentCompetitorListSchema,
+    status_code=200,
+)
+def list_competitors_in_tournament(
+    tournament_uuid: UUID,
+    session: Session = Depends(get_session),
+):
+    tournament = session.scalar(
+        select(Tournament)
+        .where(Tournament.uuid == tournament_uuid)
+    )
+
+    if not tournament:
+        raise HTTPException(status_code=404, detail='Target Tournament does not exist')
+
+    competitors = session.scalars(
+        select(Competitor)
+        .select_from(TournamentCompetitor)
+        .join(TournamentCompetitor.competitor)
+        .where(
+            TournamentCompetitor.tournament_id == tournament.id,
+        )
+    ).all()
+
+    data = {
+        'tournament': tournament,
+        'competitors': competitors,
+    }
+
+    return data
 
 
 @router.post('/{tournament_uuid}/start', response_model=TournamentStartSchema, status_code=201)
