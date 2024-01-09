@@ -24,6 +24,25 @@ def test_create_tournament(client):
     }
 
 
+def test_list_tournaments(client, tournament1, tournament2, tournament3):
+    expected_data = {
+        'tournaments': [
+            {
+                'uuid': str(tournament_.uuid),
+                'label': tournament_.label,
+            }
+            for tournament_ in [tournament1, tournament2, tournament3]
+        ],
+    }
+
+    response = client.get(
+        BASE_URL,
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected_data
+
+
 REGISTER_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE = BASE_URL + '/{tournament_uuid}/competitor'
 
 

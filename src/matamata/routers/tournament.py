@@ -10,6 +10,7 @@ from matamata.models import Competitor, Match, Tournament, TournamentCompetitor
 from matamata.schemas import (
     TournamentCompetitorPayloadSchema,
     TournamentCompetitorSchema,
+    TournamentListSchema,
     TournamentMatchesSchema,
     TournamentPayloadSchema,
     TournamentResultSchema,
@@ -35,6 +36,21 @@ def create_tournament(
     session.refresh(tournament)
 
     return tournament
+
+
+@router.get('/', response_model=TournamentListSchema, status_code=200)
+def list_tournaments(
+    session: Session = Depends(get_session),
+):
+    tournaments = session.scalars(
+        select(Tournament)
+    ).all()
+
+    data = {
+        'tournaments': tournaments,
+    }
+
+    return data
 
 
 @router.post('/{tournament_uuid}/competitor', response_model=TournamentCompetitorSchema, status_code=201)
