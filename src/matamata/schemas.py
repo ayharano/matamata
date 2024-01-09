@@ -65,6 +65,17 @@ class CompetitorListSchema(BaseModel):
     competitors: list[CompetitorSchema]
 
 
+class TournamentsAccordingToCompetitorSchema(BaseModel):
+    past: list[TournamentSchema]
+    ongoing: list[TournamentSchema]
+    upcoming: list[TournamentSchema]
+
+
+class CompetitorDetailSchema(BaseModel):
+    competitor: CompetitorSchema
+    tournaments: TournamentsAccordingToCompetitorSchema
+
+
 class TournamentCompetitorSchema(BaseModel):
     tournament: TournamentSchema
     competitor: CompetitorSchema

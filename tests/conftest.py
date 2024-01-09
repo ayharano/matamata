@@ -68,3 +68,4 @@ def tournament(session):
 
 tournament1 = tournament
 tournament2 = tournament
+tournament3 = tournament
