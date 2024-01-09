@@ -8,6 +8,8 @@ Proposed
 
 Partially superceded by [6. Removing previous match UUID data](0006-removing-previous-match-uuid-data.md)
 
+Partially superceded by [7. Providing REST API Endpoints for Stateless Operations](0007-providing-rest-api-endpoints-for-stateless-operations.md)
+
 ## Context
 
 We defined [the ubiquitous language and the rules that the system will obey](0002-defining-ubiquitous-language.md)
