@@ -9,7 +9,126 @@ from tests.utils import (
 
 BASE_URL = '/match'
 
+GET_MATCH_DETAIL_URL_TEMPLATE = BASE_URL + '/{match_uuid}'
 REGISTER_MATCH_RESULT_URL_TEMPLATE = BASE_URL + '/{match_uuid}'
+
+
+def test_200_for_get_match_detail_with_result_not_registered_yet(
+    session, client, tournament, competitor1, competitor2,
+):
+    for competitor_ in [competitor1, competitor2]:
+        tournament.competitors.append(competitor_)
+        session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    tournament, matches = start_tournament_util(
+        tournament_uuid=tournament.uuid,
+        session=session,
+    )
+
+    assert len(matches) == 1
+    final = matches[0]
+
+    assert final.round == 0
+    assert final.position == 0
+    assert final.competitorA_id is not None
+    assert final.competitorB_id is not None
+    assert final.winner_id is None
+    assert final.loser_id is None
+
+    response = client.get(
+        GET_MATCH_DETAIL_URL_TEMPLATE.format(match_uuid=final.uuid),
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        'uuid': str(final.uuid),
+        'round': 0,
+        'position': 0,
+        'competitorA': {
+            'uuid': str(final.competitorA.uuid),
+            'label': final.competitorA.label,
+        },
+        'competitorB': {
+            'uuid': str(final.competitorB.uuid),
+            'label': final.competitorB.label,
+        },
+        'winner': None,
+        'loser': None,
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+            'numberCompetitors': tournament.numberCompetitors,
+            'startingRound': tournament.startingRound,
+        },
+    }
+
+
+def test_200_for_get_match_detail_with_result_registered_with_one_competitor_only(
+    session, client, tournament, competitor,
+):
+    tournament.competitors.append(competitor)
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    # First we start the tournament
+    tournament, matches = start_tournament_util(
+        tournament_uuid=tournament.uuid,
+        session=session,
+    )
+
+    assert len(matches) == 1
+    final = matches[0]
+
+    assert final.round == 0
+    assert final.position == 0
+    assert final.competitorA_id == competitor.id
+    assert final.competitorB_id is None
+    assert final.winner_id == competitor.id
+    assert final.loser_id is None
+
+    response = client.get(
+        GET_MATCH_DETAIL_URL_TEMPLATE.format(match_uuid=final.uuid),
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        'uuid': str(final.uuid),
+        'round': 0,
+        'position': 0,
+        'competitorA': {
+            'uuid': str(competitor.uuid),
+            'label': competitor.label,
+        },
+        'competitorB': None,
+        'winner': {
+            'uuid': str(competitor.uuid),
+            'label': competitor.label,
+        },
+        'loser': None,
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+            'numberCompetitors': tournament.numberCompetitors,
+            'startingRound': tournament.startingRound,
+        },
+    }
+
+
+def test_404_for_missing_match_during_get_match_detail(client, competitor):
+    response = client.get(
+        GET_MATCH_DETAIL_URL_TEMPLATE.format(
+            match_uuid='01234567-89ab-cdef-0123-456789abcdef',
+        ),
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        'detail': 'Target Match does not exist',
+    }
 
 
 def test_200_for_register_match_result_for_final_match(

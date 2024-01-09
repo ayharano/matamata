@@ -22,6 +22,27 @@ from matamata.services.exceptions import (
 router = APIRouter(prefix='/match', tags=['match'])
 
 
+@router.get('/{match_uuid}', response_model=MatchSchema, status_code=200)
+def get_match_detail(
+    match_uuid: UUID,
+    session: Session = Depends(get_session),
+):
+    match = session.scalar(
+        select(Match)
+        .where(Match.uuid == match_uuid)
+        .options(
+            joinedload(Match.tournament),
+            joinedload(Match.competitorA),
+            joinedload(Match.competitorB),
+        )
+    )
+
+    if not match:
+        raise HTTPException(status_code=404, detail='Target Match does not exist')
+
+    return match
+
+
 @router.post('/{match_uuid}', response_model=MatchSchema, status_code=200)
 def register_match_result(
     match_uuid: UUID,
