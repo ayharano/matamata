@@ -1,5 +1,10 @@
 from datetime import datetime
 
+from tests.utils import (
+    register_match_result_util,
+    start_tournament_util,
+)
+
 
 BASE_URL = '/tournament'
 
@@ -183,6 +188,172 @@ def test_404_for_missing_tournament_during_list_competitors_in_tournament(client
     assert response.status_code == 404
     assert response.json() == {
         'detail': 'Target Tournament does not exist',
+    }
+
+
+LIST_MATCHES_FOR_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE = BASE_URL + '/{tournament_uuid}/competitor/{competitor_uuid}'
+
+
+def test_list_matches_for_competitor_in_tournament(
+    session, client, tournament, competitor1, competitor2, competitor3, competitor4,
+):
+    competitor_list = [competitor1, competitor2, competitor3, competitor4]
+    for competitor_ in competitor_list:
+        tournament.competitors.append(competitor_)
+    session.add(tournament)
+    session.commit()
+    session.refresh(tournament)
+
+    tournament, matches = start_tournament_util(
+        tournament_uuid=tournament.uuid,
+        session=session,
+    )
+
+    assert len(matches) == 4
+
+    past_match = matches[1]
+    next_match = matches[2]
+    target_competitor = past_match.competitorB
+    past_match_other_competitor = past_match.competitorA
+
+    assert past_match.round == 1
+    assert past_match.position == 1
+    assert next_match.round == 0
+    assert next_match.position == 0
+
+    register_match_result_util(
+        match_uuid=past_match.uuid,
+        winner_uuid=target_competitor.uuid,
+        session=session,
+    )
+
+    response = client.get(
+        LIST_MATCHES_FOR_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid=tournament.uuid,
+            competitor_uuid=target_competitor.uuid,
+        ),
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        'tournament': {
+            'uuid': str(tournament.uuid),
+            'label': tournament.label,
+        },
+        'competitor': {
+            'uuid': str(target_competitor.uuid),
+            'label': target_competitor.label,
+        },
+        'matches': {
+            'past': [
+                {
+                    'uuid': str(past_match.uuid),
+                    'round': 1,
+                    'position': 1,
+                    'otherCompetitor': {
+                        'uuid': str(past_match_other_competitor.uuid),
+                        'label': past_match_other_competitor.label,
+                    },
+                }
+            ],
+            'upcoming': [
+                {
+                    'uuid': str(next_match.uuid),
+                    'round': 0,
+                    'position': 0,
+                    'otherCompetitor': None,
+                }
+            ],
+        },
+    }
+
+
+def test_404_for_missing_tournament_during_list_matches_for_competitor_in_tournament(client, competitor):
+    response = client.get(
+        LIST_MATCHES_FOR_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid='01234567-89ab-cdef-0123-456789abcdef',
+            competitor_uuid=competitor.uuid,
+        ),
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        'detail': 'Target Tournament does not exist',
+    }
+
+
+def test_404_for_missing_competitor_during_list_matches_for_competitor_in_tournament(client, tournament):
+    response = client.get(
+        LIST_MATCHES_FOR_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid=tournament.uuid,
+            competitor_uuid='01234567-89ab-cdef-0123-456789abcdef',
+        ),
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        'detail': 'Target Competitor does not exist',
+    }
+
+
+def test_422_for_unregistered_competitor_in_unstarted_tournament_list_matches_for_competitor_in_tournament(
+    client, tournament, competitor,
+):
+    response = client.get(
+        LIST_MATCHES_FOR_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid=tournament.uuid,
+            competitor_uuid=competitor.uuid,
+        ),
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': 'Target Competitor is not registered for unstarted target Tournament',
+    }
+
+
+def test_409_for_unregistered_competitor_in_started_tournament_list_matches_for_competitor_in_tournament(
+    session, client, tournament, competitor1, competitor2,
+):
+    tournament.competitors.append(competitor2)
+    session.add(tournament)
+    session.commit()
+
+    tournament, _ = start_tournament_util(
+        tournament_uuid=tournament.uuid,
+        session=session,
+    )
+
+    response = client.get(
+        LIST_MATCHES_FOR_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid=tournament.uuid,
+            competitor_uuid=competitor1.uuid,
+        ),
+    )
+
+    assert response.status_code == 409
+    assert response.json() == {
+        'detail': 'Target Competitor is not registered for started target Tournament',
+    }
+
+
+def test_422_for_registered_competitor_in_unstarted_tournament_list_matches_for_competitor_in_tournament(
+    session, client, tournament, competitor,
+):
+    tournament.competitors.append(competitor)
+    session.add(tournament)
+    session.commit()
+
+    response = client.get(
+        LIST_MATCHES_FOR_COMPETITOR_IN_TOURNAMENT_URL_TEMPLATE.format(
+            tournament_uuid=tournament.uuid,
+            competitor_uuid=competitor.uuid,
+        ),
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': 'Target Tournament has not created its matches yet',
     }
 
 

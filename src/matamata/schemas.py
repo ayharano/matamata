@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, computed_field
 from pydantic.functional_validators import AfterValidator
 
 
@@ -92,6 +92,32 @@ class TournamentCompetitorListSchema(CompetitorListSchema):
 class TournamentAfterStartSchema(UuidLabelSchema):
     startingRound: NonNegativeInt
     numberCompetitors: PositiveInt
+
+
+class MatchForTournamentListingWithOtherCompetitor(BaseModel):
+    uuid: UUID
+    round: NonNegativeInt
+    position: NonNegativeInt
+    competitorA: CompetitorSchema | None = Field(exclude=True)
+    competitorB: CompetitorSchema | None = Field(exclude=True)
+    currentCompetitor: CompetitorSchema | None = Field(exclude=True)
+
+    @computed_field
+    @property
+    def otherCompetitor(self) -> CompetitorSchema | None:
+        competitors = [self.competitorA, self.competitorB]
+        competitors.remove(self.currentCompetitor)
+        other_competitor = competitors.pop()
+        return other_competitor
+
+
+class TournamentCompetitorMatchesWithOtherCompetitorSchema(BaseModel):
+    past: list[MatchForTournamentListingWithOtherCompetitor]
+    upcoming: list[MatchForTournamentListingWithOtherCompetitor]
+
+
+class TournamentCompetitorMatchesSchema(TournamentCompetitorSchema):
+    matches: TournamentCompetitorMatchesWithOtherCompetitorSchema
 
 
 class MatchSchemaForTournamentListing(BaseModel):

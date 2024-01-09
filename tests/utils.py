@@ -4,7 +4,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from matamata.models import Match, Tournament, TournamentCompetitor
-from matamata.services import start_tournament as start_tournament_service
+from matamata.services import (
+    register_match_result as register_match_result_service,
+    start_tournament as start_tournament_service,
+)
 
 
 def retrieve_tournament_competitor(
@@ -98,3 +101,23 @@ def start_tournament_util(
     )
 
     return tournament, matches
+
+
+def register_match_result_util(
+    *,
+    match_uuid: UUID,
+    winner_uuid: UUID,
+    session: Session,
+):
+    match = retrieve_match_with_tournament_and_competitors(
+        match_uuid=match_uuid,
+        session=session,
+    )
+
+    match = register_match_result_service(
+        match_with_tournament_and_competitors=match,
+        winner_uuid=winner_uuid,
+        session=session,
+    )
+
+    return match

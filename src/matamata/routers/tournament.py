@@ -9,6 +9,7 @@ from matamata.database import get_session
 from matamata.models import Competitor, Match, Tournament, TournamentCompetitor
 from matamata.schemas import (
     TournamentCompetitorListSchema,
+    TournamentCompetitorMatchesSchema,
     TournamentCompetitorPayloadSchema,
     TournamentCompetitorSchema,
     TournamentListSchema,
@@ -130,6 +131,110 @@ def list_competitors_in_tournament(
     data = {
         'tournament': tournament,
         'competitors': competitors,
+    }
+
+    return data
+
+
+@router.get(
+    '/{tournament_uuid}/competitor/{competitor_uuid}',
+    response_model=TournamentCompetitorMatchesSchema,
+    status_code=200,
+)
+def list_matches_for_competitor_in_tournament(
+    tournament_uuid: UUID,
+    competitor_uuid: UUID,
+    session: Session = Depends(get_session),
+):
+    tournament = session.scalar(
+        select(Tournament)
+        .where(Tournament.uuid == tournament_uuid)
+    )
+
+    if not tournament:
+        raise HTTPException(status_code=404, detail='Target Tournament does not exist')
+
+    competitor = session.scalar(
+        select(Competitor)
+        .where(Competitor.uuid == competitor_uuid)
+    )
+
+    if not competitor:
+        raise HTTPException(status_code=404, detail='Target Competitor does not exist')
+
+    tournament_competitor = session.scalar(
+        select(TournamentCompetitor)
+        .where(
+            TournamentCompetitor.tournament_id == tournament.id,
+            TournamentCompetitor.competitor_id == competitor.id,
+        )
+    )
+
+    if not tournament_competitor:
+        if tournament.matchesCreation:
+            raise HTTPException(
+                status_code=409,
+                detail='Target Competitor is not registered for started target Tournament',
+            )
+        else:
+            raise HTTPException(
+                status_code=422,
+                detail='Target Competitor is not registered for unstarted target Tournament',
+            )
+
+    if not tournament.matchesCreation:
+        raise HTTPException(
+            status_code=422,
+            detail='Target Tournament has not created its matches yet',
+        )
+
+    base_match_query = (
+        select(Match)
+        .where(
+            Match.tournament_id == tournament.id,
+            (
+                (Match.competitorA_id == competitor.id)
+                | (Match.competitorB_id == competitor.id)
+            )
+        )
+        .order_by(
+            Match.round.desc(),
+            Match.position.asc(),
+        )
+    )
+
+    bare_past_matches = session.scalars(
+        base_match_query
+        .where(
+            Match.resultRegistration.is_not(None),
+            Match.winner_id.is_not(None),
+        )
+    ).all()
+    bare_upcoming_matches = session.scalars(
+        base_match_query
+        .where(
+            Match.resultRegistration.is_(None),
+            Match.winner_id.is_(None),
+        )
+    ).all()
+
+    past_matches = []
+    for current_match in bare_past_matches:
+        current_match.currentCompetitor = competitor
+        past_matches.append(current_match)
+
+    upcoming_matches = []
+    for current_match in bare_upcoming_matches:
+        current_match.currentCompetitor = competitor
+        upcoming_matches.append(current_match)
+
+    data = {
+        'tournament': tournament,
+        'competitor': competitor,
+        'matches': {
+            'past': past_matches,
+            'upcoming': upcoming_matches,
+        }
     }
 
     return data
