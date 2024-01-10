@@ -152,6 +152,7 @@ All the client access can be done in the URL that the server is running as the r
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/20/) 2.0
 - [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/) 0.41
 - [Alembic](https://alembic.sqlalchemy.org/) 1.13
+- [psycopg](https://www.psycopg.org/) 3.1
 
 ## Test Dependencies
 - [pytest](https://docs.pytest.org/) 7.4
