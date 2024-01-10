@@ -8,7 +8,7 @@ Proposed
 
 Partially superceded by [6. Removing previous match UUID data](0006-removing-previous-match-uuid-data.md)
 
-Partially superceded by [7. Providing REST API Endpoints for Stateless Operations](0007-providing-rest-api-endpoints-for-stateless-operations.md)
+Partially superceded by [7. Adding New REST API Endpoints for More User-Friendly Experience](0007-adding-new-rest-api-endpoints-for-more-user-friendly-experience.md)
 
 ## Context
 
