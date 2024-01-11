@@ -9,7 +9,7 @@ from matamata.models.constants import COMPETITOR_LABEL_CONSTRAINT
 
 
 def test_create_and_retrieve_competitor(session):
-    before_new_competitor = datetime.now()
+    before_new_competitor = datetime.utcnow()
     new_competitor = Competitor(
         label='South Korea',
     )

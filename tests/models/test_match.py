@@ -17,7 +17,7 @@ from tests.utils import (
 
 
 def test_create_and_retrieve_match(session, tournament, competitor1, competitor2):
-    before_new_match = datetime.now()
+    before_new_match = datetime.utcnow()
     new_match = Match(
         tournament_id=tournament.id,
         round=0,

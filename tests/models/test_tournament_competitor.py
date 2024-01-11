@@ -8,7 +8,7 @@ from matamata.models import TournamentCompetitor
 
 
 def test_create_and_retrieve_tournamentcompetitor(session, competitor, tournament):
-    before_new_tournament_competitor = datetime.now()
+    before_new_tournament_competitor = datetime.utcnow()
     new_tournament_competitor = TournamentCompetitor(
         tournament=tournament,
         competitor=competitor,

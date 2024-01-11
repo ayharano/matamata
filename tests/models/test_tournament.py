@@ -10,7 +10,7 @@ from matamata.models.exceptions import CannotUpdateTournamentDataAfterStartError
 
 
 def test_create_and_retrieve_tournament(session):
-    before_new_tournament = datetime.now()
+    before_new_tournament = datetime.utcnow()
     new_tournament = Tournament(
         label='2022 FIFA World Cup',
     )
