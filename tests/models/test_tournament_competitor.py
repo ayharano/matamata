@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 import pytest
@@ -45,7 +46,7 @@ def test_cannot_create_duplicate_tournament_competitor(session, competitor, tour
     session.add(duplicate_tournament_competitor)
     with pytest.raises(
         IntegrityError,
-        match="UNIQUE constraint",
+        match=re.compile("unique constraint", re.IGNORECASE),
     ):
         session.commit()
 

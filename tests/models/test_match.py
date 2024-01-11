@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from matamata.models import Match
 from matamata.models.constants import (
+    MATCH_TOURNAMENT_ROUND_POSITION_UNIQUE_CONSTRAINT,
     MATCH_ROUND_CONSTRAINT,
     MATCH_POSITION_CONSTRAINT,
     MATCH_ROUND_POSITION_CONSTRAINT,
@@ -69,7 +70,7 @@ def test_cannot_create_duplicate_match(session, tournament, competitor1, competi
     session.add(duplicate_match)
     with pytest.raises(
         IntegrityError,
-        match="UNIQUE constraint",
+        match=MATCH_TOURNAMENT_ROUND_POSITION_UNIQUE_CONSTRAINT,
     ):
         session.commit()
 
