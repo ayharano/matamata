@@ -106,7 +106,9 @@ This command is a chained call of 3 executions, being
 
 As mentioned in [the `Project Configuration` section](#project-configuration), a sample `.env` file is provided as `.env.sample`.
 
-Currently, it suggests using SQLite using a `local.db` file. If this configuration is maintained, whenever necessary, the file will be created or reused.
+Currently, it suggests using `DATABASE_URL` value to access a PostgreSQL instance using psycopg with placeholder values of user, password, instance, and database.
+
+Adjust that value accordingly to match your local environment settings.
 
 # Running the test suite
 

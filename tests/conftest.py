@@ -2,7 +2,6 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from matamata.database import get_session
 from matamata.main import app
@@ -13,17 +12,12 @@ from tests.models.factories import CompetitorFactory, TournamentFactory
 
 @pytest.fixture
 def session():
-    # Defaulting to in-memory SQLite
-    engine_args = ['sqlite:///:memory:']
-    engine_kwargs = {
-        'connect_args': {'check_same_thread': False},
-        'poolclass': StaticPool,
-    }
-
-    engine = create_engine(*engine_args, **engine_kwargs)
+    engine = create_engine(settings.DATABASE_URL)
     Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(engine)
-    yield Session()
+    with Session() as session:
+        yield session
+        session.rollback()
     Base.metadata.drop_all(engine)
 
 
