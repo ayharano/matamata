@@ -38,7 +38,7 @@ class Match(IdUuidTimestampedBase):
         ),
         CheckConstraint(
             '('
-            ' round == 0'
+            ' round = 0'
             ' AND position < 2'
             ') OR ('
             ' round > 0'
