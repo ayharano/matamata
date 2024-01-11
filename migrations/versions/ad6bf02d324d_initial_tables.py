@@ -1,8 +1,8 @@
 """initial tables
 
-Revision ID: 0f0f741a699a
+Revision ID: ad6bf02d324d
 Revises: 
-Create Date: 2024-01-05 06:53:21.716643
+Create Date: 2024-01-11 12:28:20.802398
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0f0f741a699a'
+revision: str = 'ad6bf02d324d'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -32,15 +32,15 @@ def upgrade() -> None:
     )
     op.create_table('tournament',
     sa.Column('label', sa.String(length=255), nullable=False),
-    sa.Column('matchesCreation', sa.DateTime(), nullable=True),
-    sa.Column('numberCompetitors', sa.Integer(), nullable=True),
-    sa.Column('startingRound', sa.Integer(), nullable=True),
+    sa.Column('matches_creation', sa.DateTime(), nullable=True),
+    sa.Column('number_competitors', sa.Integer(), nullable=True),
+    sa.Column('starting_round', sa.Integer(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('uuid', sa.Uuid(), nullable=False),
     sa.Column('created', sa.DateTime(), nullable=False),
     sa.Column('updated', sa.DateTime(), nullable=False),
     sa.CheckConstraint("NOT(TRIM(label) LIKE '')", name='tournament_label_not_empty_nor_whitespace_only'),
-    sa.CheckConstraint('( matchesCreation IS NULL AND numberCompetitors IS NULL AND startingRound IS NULL) OR ( matchesCreation IS NOT NULL AND numberCompetitors IS NOT NULL AND startingRound IS NOT NULL AND numberCompetitors >= 1 AND startingRound >= 0)', name='tournament_matchesCreation_competitors_startingRound_must_be_all_null_or_all_set_under_conditions'),
+    sa.CheckConstraint('( matches_creation IS NULL AND number_competitors IS NULL AND starting_round IS NULL) OR ( matches_creation IS NOT NULL AND number_competitors IS NOT NULL AND starting_round IS NOT NULL AND number_competitors >= 1 AND starting_round >= 0)', name='tournament_all_null_or_all_set_under_conditions'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('uuid')
     )
@@ -48,23 +48,23 @@ def upgrade() -> None:
     sa.Column('tournament_id', sa.Integer(), nullable=False),
     sa.Column('round', sa.Integer(), nullable=False),
     sa.Column('position', sa.Integer(), nullable=False),
-    sa.Column('competitorA_id', sa.Integer(), nullable=True),
-    sa.Column('competitorB_id', sa.Integer(), nullable=True),
-    sa.Column('resultRegistration', sa.DateTime(), nullable=True),
+    sa.Column('competitor_a_id', sa.Integer(), nullable=True),
+    sa.Column('competitor_b_id', sa.Integer(), nullable=True),
+    sa.Column('result_registration', sa.DateTime(), nullable=True),
     sa.Column('winner_id', sa.Integer(), nullable=True),
     sa.Column('loser_id', sa.Integer(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('uuid', sa.Uuid(), nullable=False),
     sa.Column('created', sa.DateTime(), nullable=False),
     sa.Column('updated', sa.DateTime(), nullable=False),
-    sa.CheckConstraint('( competitorA_id IS NULL AND competitorB_id IS NULL) OR ( competitorA_id <> competitorB_id)', name='match_non_null_competitors_cannot_be_the_same'),
-    sa.CheckConstraint('( resultRegistration IS NULL AND loser_id is NULL) OR ( resultRegistration IS NOT NULL AND loser_id is NULL) OR ( resultRegistration IS NOT NULL AND loser_id IS NOT NULL)', name='match_result_registration_loser'),
-    sa.CheckConstraint('( resultRegistration IS NULL AND winner_id is NULL) OR ( resultRegistration IS NOT NULL AND winner_id IS NOT NULL)', name='match_result_registration_winner'),
-    sa.CheckConstraint('( round == 0 AND position < 2) OR ( round > 0 AND position < pow(2, round))', name='match_round_position_values'),
+    sa.CheckConstraint('( competitor_a_id IS NULL AND competitor_b_id IS NULL) OR ( competitor_a_id <> competitor_b_id)', name='match_non_null_competitors_cannot_be_the_same'),
+    sa.CheckConstraint('( result_registration IS NULL AND loser_id is NULL) OR ( result_registration IS NOT NULL AND loser_id is NULL) OR ( result_registration IS NOT NULL AND loser_id IS NOT NULL)', name='match_result_registration_loser'),
+    sa.CheckConstraint('( result_registration IS NULL AND winner_id is NULL) OR ( result_registration IS NOT NULL AND winner_id IS NOT NULL)', name='match_result_registration_winner'),
+    sa.CheckConstraint('( round = 0 AND position < 2) OR ( round > 0 AND position < pow(2, round))', name='match_round_position_values'),
     sa.CheckConstraint('position >= 0', name='match_position_non_negative'),
     sa.CheckConstraint('round >= 0', name='match_round_non_negative'),
-    sa.ForeignKeyConstraint(['competitorA_id'], ['competitor.id'], ),
-    sa.ForeignKeyConstraint(['competitorB_id'], ['competitor.id'], ),
+    sa.ForeignKeyConstraint(['competitor_a_id'], ['competitor.id'], ),
+    sa.ForeignKeyConstraint(['competitor_b_id'], ['competitor.id'], ),
     sa.ForeignKeyConstraint(['loser_id'], ['competitor.id'], ),
     sa.ForeignKeyConstraint(['tournament_id'], ['tournament.id'], ),
     sa.ForeignKeyConstraint(['winner_id'], ['competitor.id'], ),
