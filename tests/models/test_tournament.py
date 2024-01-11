@@ -82,7 +82,7 @@ def test_can_create_duplicate_tournament(session):
     assert count == 2
 
 
-def test_tournament_matchescreation_must_be_non_null_with_positive_numbercompetitors(session):
+def test_tournament_matches_creation_must_be_non_null_with_positive_number_competitors(session):
     tournament = Tournament(
         label='2022 FIFA World Cup',
     )
@@ -90,8 +90,8 @@ def test_tournament_matchescreation_must_be_non_null_with_positive_numbercompeti
     session.commit()
     session.refresh(tournament)
 
-    # set matchesCreation but not numberCompetitors >= 1 nor startingRound >= 0
-    tournament.matchesCreation = datetime(year=2022, month=1, day=1)
+    # set matches_creation but not number_competitors >= 1 nor starting_round >= 0
+    tournament.matches_creation = datetime(year=2022, month=1, day=1)
     session.add(tournament)
     with pytest.raises(
         IntegrityError,
@@ -101,9 +101,9 @@ def test_tournament_matchescreation_must_be_non_null_with_positive_numbercompeti
     session.rollback()
     session.refresh(tournament)
 
-    # set matchesCreation and numberCompetitors >= 1 but not startingRound >= 0
-    tournament.matchesCreation = datetime(year=2022, month=1, day=1)
-    tournament.numberCompetitors = 1
+    # set matches_creation and number_competitors >= 1 but not starting_round >= 0
+    tournament.matches_creation = datetime(year=2022, month=1, day=1)
+    tournament.number_competitors = 1
     session.add(tournament)
     with pytest.raises(
         IntegrityError,
@@ -113,10 +113,10 @@ def test_tournament_matchescreation_must_be_non_null_with_positive_numbercompeti
     session.rollback()
     session.refresh(tournament)
 
-    # set matchesCreation, numberCompetitors >= 1 and startingRound >= 0
-    tournament.matchesCreation = datetime(year=2022, month=1, day=1)
-    tournament.numberCompetitors = 1
-    tournament.startingRound = 0
+    # set matches_creation, number_competitors >= 1 and starting_round >= 0
+    tournament.matches_creation = datetime(year=2022, month=1, day=1)
+    tournament.number_competitors = 1
+    tournament.starting_round = 0
     session.add(tournament)
     session.commit()
     session.refresh(tournament)
@@ -130,42 +130,42 @@ def test_tournament_does_not_allow_changing_attrs_after_start(session):
     session.commit()
     session.refresh(tournament)
 
-    # set matchesCreation, numberCompetitors >= 1 and startingRound >= 0
-    tournament.matchesCreation = datetime(year=2022, month=1, day=1)
-    tournament.numberCompetitors = 1
-    tournament.startingRound = 0
+    # set matches_creation, number_competitors >= 1 and starting_round >= 0
+    tournament.matches_creation = datetime(year=2022, month=1, day=1)
+    tournament.number_competitors = 1
+    tournament.starting_round = 0
     session.add(tournament)
     session.commit()
     session.refresh(tournament)
 
-    # try to update matchesCreation after setting it
-    tournament.matchesCreation = datetime(year=2021, month=1, day=1)
+    # try to update matches_creation after setting it
+    tournament.matches_creation = datetime(year=2021, month=1, day=1)
     session.add(tournament)
     with pytest.raises(
         CannotUpdateTournamentDataAfterStartError,
-        match='matchesCreation is not allowed to be updated after Tournament start',
+        match='matches_creation is not allowed to be updated after Tournament start',
     ):
         session.commit()
     session.rollback()
     session.refresh(tournament)
 
-    # try to update numberCompetitors after setting it
-    tournament.numberCompetitors = 2
+    # try to update number_competitors after setting it
+    tournament.number_competitors = 2
     session.add(tournament)
     with pytest.raises(
         CannotUpdateTournamentDataAfterStartError,
-        match='numberCompetitors is not allowed to be updated after Tournament start',
+        match='number_competitors is not allowed to be updated after Tournament start',
     ):
         session.commit()
     session.rollback()
     session.refresh(tournament)
 
-    # try to update startingRound after setting it
-    tournament.startingRound = 1
+    # try to update starting_round after setting it
+    tournament.starting_round = 1
     session.add(tournament)
     with pytest.raises(
         CannotUpdateTournamentDataAfterStartError,
-        match='startingRound is not allowed to be updated after Tournament start',
+        match='starting_round is not allowed to be updated after Tournament start',
     ):
         session.commit()
     session.rollback()

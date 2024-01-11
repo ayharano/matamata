@@ -57,12 +57,12 @@ def process_automatic_winning(
 
     for match_index in range(number_of_entry_matches):
         current_match = match_data[match_index]
-        if 'competitorB' in current_match:
+        if 'competitor_b' in current_match:
             continue
         # automatic winning found
-        competitor = current_match['competitorA']
+        competitor = current_match['competitor_a']
         current_match |= {
-            'resultRegistration': datetime.utcnow(),
+            'result_registration': datetime.utcnow(),
             'winner': competitor,
         }
 
@@ -82,7 +82,7 @@ def process_automatic_winning(
         )
 
         next_match_data = match_data[next_match_index_in_match_data]
-        next_match_key_name = 'competitorA' if next_match_competitor_index == 0 else 'competitorB'
+        next_match_key_name = 'competitor_a' if next_match_competitor_index == 0 else 'competitor_b'
         next_match_data[next_match_key_name] = competitor
         map_competitor_next_match_index[competitor] = next_match_index_in_match_data
 
@@ -135,7 +135,7 @@ def inline_random_pair_of_entry_match_competitors(
     for index, competitor in enumerate(shuffled_competitors):
         competitor_index, match_index = divmod(index, number_of_entry_matches)
 
-        key_name = 'competitorA' if competitor_index == 0 else 'competitorB'
+        key_name = 'competitor_a' if competitor_index == 0 else 'competitor_b'
         match_data[match_index][key_name] = competitor
         map_competitor_next_match_index[competitor] = match_index
 
@@ -153,9 +153,9 @@ def insert_and_refresh_match_data_as_match_instances(
         for current_match_data in match_data
     ]
     tournament.matches.extend(new_matches)
-    tournament.matchesCreation = datetime.utcnow()
-    tournament.numberCompetitors = number_of_competitors
-    tournament.startingRound = starting_round
+    tournament.matches_creation = datetime.utcnow()
+    tournament.number_competitors = number_of_competitors
+    tournament.starting_round = starting_round
     session.add(tournament)
     session.commit()
     for match_ in new_matches:

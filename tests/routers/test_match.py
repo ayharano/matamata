@@ -33,8 +33,8 @@ def test_200_for_get_match_detail_with_result_not_registered_yet(
 
     assert final.round == 0
     assert final.position == 0
-    assert final.competitorA_id is not None
-    assert final.competitorB_id is not None
+    assert final.competitor_a_id is not None
+    assert final.competitor_b_id is not None
     assert final.winner_id is None
     assert final.loser_id is None
 
@@ -48,20 +48,20 @@ def test_200_for_get_match_detail_with_result_not_registered_yet(
         'round': 0,
         'position': 0,
         'competitorA': {
-            'uuid': str(final.competitorA.uuid),
-            'label': final.competitorA.label,
+            'uuid': str(final.competitor_a.uuid),
+            'label': final.competitor_a.label,
         },
         'competitorB': {
-            'uuid': str(final.competitorB.uuid),
-            'label': final.competitorB.label,
+            'uuid': str(final.competitor_b.uuid),
+            'label': final.competitor_b.label,
         },
         'winner': None,
         'loser': None,
         'tournament': {
             'uuid': str(tournament.uuid),
             'label': tournament.label,
-            'numberCompetitors': tournament.numberCompetitors,
-            'startingRound': tournament.startingRound,
+            'numberCompetitors': tournament.number_competitors,
+            'startingRound': tournament.starting_round,
         },
     }
 
@@ -85,8 +85,8 @@ def test_200_for_get_match_detail_with_result_registered_with_one_competitor_onl
 
     assert final.round == 0
     assert final.position == 0
-    assert final.competitorA_id == competitor.id
-    assert final.competitorB_id is None
+    assert final.competitor_a_id == competitor.id
+    assert final.competitor_b_id is None
     assert final.winner_id == competitor.id
     assert final.loser_id is None
 
@@ -112,8 +112,8 @@ def test_200_for_get_match_detail_with_result_registered_with_one_competitor_onl
         'tournament': {
             'uuid': str(tournament.uuid),
             'label': tournament.label,
-            'numberCompetitors': tournament.numberCompetitors,
-            'startingRound': tournament.startingRound,
+            'numberCompetitors': tournament.number_competitors,
+            'startingRound': tournament.starting_round,
         },
     }
 
@@ -151,20 +151,20 @@ def test_200_for_register_match_result_for_final_match(
 
     assert final.round == 0
     assert final.position == 0
-    assert final.competitorA_id is not None
-    assert final.competitorB_id is not None
+    assert final.competitor_a_id is not None
+    assert final.competitor_b_id is not None
     assert final.winner_id is None
     assert final.loser_id is None
 
     # Verify next match for entry_match.competitorA and entry_match.competitorB
     tournament_competitor_competitorA = retrieve_tournament_competitor(
         tournament_id=final.tournament_id,
-        competitor_id=final.competitorA_id,
+        competitor_id=final.competitor_a_id,
         session=session,
     )
     tournament_competitor_competitorB = retrieve_tournament_competitor(
         tournament_id=final.tournament_id,
-        competitor_id=final.competitorB_id,
+        competitor_id=final.competitor_b_id,
         session=session,
     )
 
@@ -174,7 +174,7 @@ def test_200_for_register_match_result_for_final_match(
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=final.uuid),
         json={
-            'winner_uuid': str(final.competitorB.uuid),
+            'winner_uuid': str(final.competitor_b.uuid),
         },
     )
 
@@ -184,26 +184,26 @@ def test_200_for_register_match_result_for_final_match(
         'round': 0,
         'position': 0,
         'competitorA': {
-            'uuid': str(final.competitorA.uuid),
-            'label': final.competitorA.label,
+            'uuid': str(final.competitor_a.uuid),
+            'label': final.competitor_a.label,
         },
         'competitorB': {
-            'uuid': str(final.competitorB.uuid),
-            'label': final.competitorB.label,
+            'uuid': str(final.competitor_b.uuid),
+            'label': final.competitor_b.label,
         },
         'winner': {
-            'uuid': str(final.competitorB.uuid),
-            'label': final.competitorB.label,
+            'uuid': str(final.competitor_b.uuid),
+            'label': final.competitor_b.label,
         },
         'loser': {
-            'uuid': str(final.competitorA.uuid),
-            'label': final.competitorA.label,
+            'uuid': str(final.competitor_a.uuid),
+            'label': final.competitor_a.label,
         },
         'tournament': {
             'uuid': str(tournament.uuid),
             'label': tournament.label,
-            'numberCompetitors': tournament.numberCompetitors,
-            'startingRound': tournament.startingRound,
+            'numberCompetitors': tournament.number_competitors,
+            'startingRound': tournament.starting_round,
         },
     }
 
@@ -235,8 +235,8 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
 
     assert semifinal_r1p0.round == 1
     assert semifinal_r1p0.position == 0
-    assert semifinal_r1p0.competitorA_id is not None
-    assert semifinal_r1p0.competitorB_id is not None
+    assert semifinal_r1p0.competitor_a_id is not None
+    assert semifinal_r1p0.competitor_b_id is not None
     assert semifinal_r1p0.winner_id is None
     assert semifinal_r1p0.loser_id is None
 
@@ -248,20 +248,20 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
     assert third_place_match.round == 0
     assert third_place_match.position == 1
 
-    assert final_match.competitorA_id is None
-    assert final_match.competitorB_id is not None
-    assert third_place_match.competitorA_id is None
-    assert third_place_match.competitorB_id is None
+    assert final_match.competitor_a_id is None
+    assert final_match.competitor_b_id is not None
+    assert third_place_match.competitor_a_id is None
+    assert third_place_match.competitor_b_id is None
 
     # Verify next match for entry_match.competitorA and entry_match.competitorB
     tournament_competitor_competitorA = retrieve_tournament_competitor(
         tournament_id=semifinal_r1p0.tournament_id,
-        competitor_id=semifinal_r1p0.competitorA_id,
+        competitor_id=semifinal_r1p0.competitor_a_id,
         session=session,
     )
     tournament_competitor_competitorB = retrieve_tournament_competitor(
         tournament_id=semifinal_r1p0.tournament_id,
-        competitor_id=semifinal_r1p0.competitorB_id,
+        competitor_id=semifinal_r1p0.competitor_b_id,
         session=session,
     )
 
@@ -271,7 +271,7 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=semifinal_r1p0.uuid),
         json={
-            'winner_uuid': str(semifinal_r1p0.competitorB.uuid),
+            'winner_uuid': str(semifinal_r1p0.competitor_b.uuid),
         },
     )
 
@@ -281,26 +281,26 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
         'round': 1,
         'position': 0,
         'competitorA': {
-            'uuid': str(semifinal_r1p0.competitorA.uuid),
-            'label': semifinal_r1p0.competitorA.label,
+            'uuid': str(semifinal_r1p0.competitor_a.uuid),
+            'label': semifinal_r1p0.competitor_a.label,
         },
         'competitorB': {
-            'uuid': str(semifinal_r1p0.competitorB.uuid),
-            'label': semifinal_r1p0.competitorB.label,
+            'uuid': str(semifinal_r1p0.competitor_b.uuid),
+            'label': semifinal_r1p0.competitor_b.label,
         },
         'winner': {
-            'uuid': str(semifinal_r1p0.competitorB.uuid),
-            'label': semifinal_r1p0.competitorB.label,
+            'uuid': str(semifinal_r1p0.competitor_b.uuid),
+            'label': semifinal_r1p0.competitor_b.label,
         },
         'loser': {
-            'uuid': str(semifinal_r1p0.competitorA.uuid),
-            'label': semifinal_r1p0.competitorA.label,
+            'uuid': str(semifinal_r1p0.competitor_a.uuid),
+            'label': semifinal_r1p0.competitor_a.label,
         },
         'tournament': {
             'uuid': str(tournament.uuid),
             'label': tournament.label,
-            'numberCompetitors': tournament.numberCompetitors,
-            'startingRound': tournament.startingRound,
+            'numberCompetitors': tournament.number_competitors,
+            'startingRound': tournament.starting_round,
         },
     }
 
@@ -311,8 +311,8 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
     session.refresh(tournament_competitor_competitorA)
     session.refresh(tournament_competitor_competitorB)
 
-    assert final_match.competitorA_id == semifinal_r1p0.winner_id
-    assert third_place_match.competitorA_id == semifinal_r1p0.loser_id
+    assert final_match.competitor_a_id == semifinal_r1p0.winner_id
+    assert third_place_match.competitor_a_id == semifinal_r1p0.loser_id
     assert third_place_match.winner_id == semifinal_r1p0.loser_id
     assert tournament_competitor_competitorA.next_match_id is None
     assert tournament_competitor_competitorB.next_match_id == final_match.id
@@ -337,8 +337,8 @@ def test_200_for_register_match_result_for_round_1_match(
 
     assert semifinal_r1p1.round == 1
     assert semifinal_r1p1.position == 1
-    assert semifinal_r1p1.competitorA_id is not None
-    assert semifinal_r1p1.competitorB_id is not None
+    assert semifinal_r1p1.competitor_a_id is not None
+    assert semifinal_r1p1.competitor_b_id is not None
     assert semifinal_r1p1.winner_id is None
     assert semifinal_r1p1.loser_id is None
 
@@ -350,18 +350,18 @@ def test_200_for_register_match_result_for_round_1_match(
     assert third_place_match.round == 0
     assert third_place_match.position == 1
 
-    assert final_match.competitorB_id is None
-    assert third_place_match.competitorB_id is None
+    assert final_match.competitor_b_id is None
+    assert third_place_match.competitor_b_id is None
 
     # Verify next match for entry_match.competitorA and entry_match.competitorB
     tournament_competitor_competitorA = retrieve_tournament_competitor(
         tournament_id=semifinal_r1p1.tournament_id,
-        competitor_id=semifinal_r1p1.competitorA_id,
+        competitor_id=semifinal_r1p1.competitor_a_id,
         session=session,
     )
     tournament_competitor_competitorB = retrieve_tournament_competitor(
         tournament_id=semifinal_r1p1.tournament_id,
-        competitor_id=semifinal_r1p1.competitorB_id,
+        competitor_id=semifinal_r1p1.competitor_b_id,
         session=session,
     )
 
@@ -371,7 +371,7 @@ def test_200_for_register_match_result_for_round_1_match(
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=semifinal_r1p1.uuid),
         json={
-            'winner_uuid': str(semifinal_r1p1.competitorA.uuid),
+            'winner_uuid': str(semifinal_r1p1.competitor_a.uuid),
         },
     )
 
@@ -381,26 +381,26 @@ def test_200_for_register_match_result_for_round_1_match(
         'round': 1,
         'position': 1,
         'competitorA': {
-            'uuid': str(semifinal_r1p1.competitorA.uuid),
-            'label': semifinal_r1p1.competitorA.label,
+            'uuid': str(semifinal_r1p1.competitor_a.uuid),
+            'label': semifinal_r1p1.competitor_a.label,
         },
         'competitorB': {
-            'uuid': str(semifinal_r1p1.competitorB.uuid),
-            'label': semifinal_r1p1.competitorB.label,
+            'uuid': str(semifinal_r1p1.competitor_b.uuid),
+            'label': semifinal_r1p1.competitor_b.label,
         },
         'winner': {
-            'uuid': str(semifinal_r1p1.competitorA.uuid),
-            'label': semifinal_r1p1.competitorA.label,
+            'uuid': str(semifinal_r1p1.competitor_a.uuid),
+            'label': semifinal_r1p1.competitor_a.label,
         },
         'loser': {
-            'uuid': str(semifinal_r1p1.competitorB.uuid),
-            'label': semifinal_r1p1.competitorB.label,
+            'uuid': str(semifinal_r1p1.competitor_b.uuid),
+            'label': semifinal_r1p1.competitor_b.label,
         },
         'tournament': {
             'uuid': str(tournament.uuid),
             'label': tournament.label,
-            'numberCompetitors': tournament.numberCompetitors,
-            'startingRound': tournament.startingRound,
+            'numberCompetitors': tournament.number_competitors,
+            'startingRound': tournament.starting_round,
         },
     }
 
@@ -411,7 +411,7 @@ def test_200_for_register_match_result_for_round_1_match(
     session.refresh(tournament_competitor_competitorA)
     session.refresh(tournament_competitor_competitorB)
 
-    assert final_match.competitorB_id == semifinal_r1p1.winner_id
+    assert final_match.competitor_b_id == semifinal_r1p1.winner_id
     assert tournament_competitor_competitorA.next_match_id == final_match.id
     assert tournament_competitor_competitorB.next_match_id == third_place_match.id
 
@@ -435,8 +435,8 @@ def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
 
     assert entry_match.round == 2
     assert entry_match.position == 0
-    assert entry_match.competitorA_id is not None
-    assert entry_match.competitorB_id is not None
+    assert entry_match.competitor_a_id is not None
+    assert entry_match.competitor_b_id is not None
     assert entry_match.winner_id is None
     assert entry_match.loser_id is None
 
@@ -444,17 +444,17 @@ def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
 
     assert next_match.round == 1
     assert next_match.position == 0
-    assert next_match.competitorA_id is None
+    assert next_match.competitor_a_id is None
 
     # Verify next match for entry_match.competitorA and entry_match.competitorB
     tournament_competitor_competitorA = retrieve_tournament_competitor(
         tournament_id=entry_match.tournament_id,
-        competitor_id=entry_match.competitorA_id,
+        competitor_id=entry_match.competitor_a_id,
         session=session,
     )
     tournament_competitor_competitorB = retrieve_tournament_competitor(
         tournament_id=entry_match.tournament_id,
-        competitor_id=entry_match.competitorB_id,
+        competitor_id=entry_match.competitor_b_id,
         session=session,
     )
 
@@ -464,7 +464,7 @@ def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=entry_match.uuid),
         json={
-            'winner_uuid': str(entry_match.competitorA.uuid),
+            'winner_uuid': str(entry_match.competitor_a.uuid),
         },
     )
 
@@ -474,26 +474,26 @@ def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
         'round': 2,
         'position': 0,
         'competitorA': {
-            'uuid': str(entry_match.competitorA.uuid),
-            'label': entry_match.competitorA.label,
+            'uuid': str(entry_match.competitor_a.uuid),
+            'label': entry_match.competitor_a.label,
         },
         'competitorB': {
-            'uuid': str(entry_match.competitorB.uuid),
-            'label': entry_match.competitorB.label,
+            'uuid': str(entry_match.competitor_b.uuid),
+            'label': entry_match.competitor_b.label,
         },
         'winner': {
-            'uuid': str(entry_match.competitorA.uuid),
-            'label': entry_match.competitorA.label,
+            'uuid': str(entry_match.competitor_a.uuid),
+            'label': entry_match.competitor_a.label,
         },
         'loser': {
-            'uuid': str(entry_match.competitorB.uuid),
-            'label': entry_match.competitorB.label,
+            'uuid': str(entry_match.competitor_b.uuid),
+            'label': entry_match.competitor_b.label,
         },
         'tournament': {
             'uuid': str(tournament.uuid),
             'label': tournament.label,
-            'numberCompetitors': tournament.numberCompetitors,
-            'startingRound': tournament.startingRound,
+            'numberCompetitors': tournament.number_competitors,
+            'startingRound': tournament.starting_round,
         },
     }
 
@@ -503,7 +503,7 @@ def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
     session.refresh(tournament_competitor_competitorA)
     session.refresh(tournament_competitor_competitorB)
 
-    assert next_match.competitorA_id == entry_match.winner_id
+    assert next_match.competitor_a_id == entry_match.winner_id
     assert tournament_competitor_competitorA.next_match_id == next_match.id
     assert tournament_competitor_competitorB.next_match_id is None
 
@@ -534,8 +534,8 @@ def test_409_for_match_with_registered_result_during_register_match_result(clien
         tournament_id=tournament.id,
         round=0,
         position=0,
-        competitorA_id=competitor.id,
-        resultRegistration=datetime(year=2024, month=1, day=2),
+        competitor_a_id=competitor.id,
+        result_registration=datetime(year=2024, month=1, day=2),
         winner_id=competitor.id,
     )
     session.add(final_match)
@@ -556,16 +556,16 @@ def test_409_for_match_with_registered_result_during_register_match_result(clien
 
 
 def test_409_for_match_that_should_have_automatic_winner_during_register_match_result(client, session, tournament, competitor):
-    tournament.matchesCreation = datetime(year=2024, month=1, day=1)
-    tournament.numberCompetitors = 1
-    tournament.startingRound = 0
+    tournament.matches_creation = datetime(year=2024, month=1, day=1)
+    tournament.number_competitors = 1
+    tournament.starting_round = 0
     tournament.competitors.append(competitor)
     session.add(tournament)
     final_match = Match(
         tournament_id=tournament.id,
         round=0,
         position=0,
-        competitorA_id=competitor.id,
+        competitor_a_id=competitor.id,
     )
     session.add(final_match)
     session.commit()
@@ -627,8 +627,8 @@ def test_409_for_competitor_not_match_competitor_during_register_match_result(cl
         tournament_id=tournament.id,
         round=0,
         position=0,
-        competitorA_id=competitor1.id,
-        competitorB_id=competitor2.id,
+        competitor_a_id=competitor1.id,
+        competitor_b_id=competitor2.id,
     )
     session.add(final_match)
     session.commit()

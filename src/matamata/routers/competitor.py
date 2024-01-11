@@ -70,21 +70,21 @@ def get_competitor_data(
     past_tournaments_query = (
         base_tournament_query
         .where(
-            Tournament.startingRound.is_not(None),
+            Tournament.starting_round.is_not(None),
             TournamentCompetitor.next_match_id.is_(None),
         )
     )
     ongoing_tournaments_query = (
         base_tournament_query
         .where(
-            Tournament.startingRound.is_not(None),
+            Tournament.starting_round.is_not(None),
             TournamentCompetitor.next_match_id.is_not(None),
         )
     )
     upcoming_tournaments_query = (
         base_tournament_query
         .where(
-            Tournament.startingRound.is_(None),
+            Tournament.starting_round.is_(None),
         )
     )
 

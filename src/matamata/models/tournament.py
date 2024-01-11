@@ -12,7 +12,7 @@ from .exceptions import CannotUpdateTournamentDataAfterStartError
 from .tournament_competitor import TournamentCompetitor
 
 
-SET_AFTER_START_ATTRS = {'matchesCreation', 'numberCompetitors', 'startingRound'}
+SET_AFTER_START_ATTRS = {'matches_creation', 'number_competitors', 'starting_round'}
 
 
 @generic_repr
@@ -25,24 +25,24 @@ class Tournament(IdUuidTimestampedBase):
         ),
         CheckConstraint(
             '('
-            ' matchesCreation IS NULL'
-            ' AND numberCompetitors IS NULL'
-            ' AND startingRound IS NULL'
+            ' matches_creation IS NULL'
+            ' AND number_competitors IS NULL'
+            ' AND starting_round IS NULL'
             ') OR ('
-            ' matchesCreation IS NOT NULL'
-            ' AND numberCompetitors IS NOT NULL'
-            ' AND startingRound IS NOT NULL'
-            ' AND numberCompetitors >= 1'
-            ' AND startingRound >= 0'
+            ' matches_creation IS NOT NULL'
+            ' AND number_competitors IS NOT NULL'
+            ' AND starting_round IS NOT NULL'
+            ' AND number_competitors >= 1'
+            ' AND starting_round >= 0'
             ')',
             name=TOURNAMENT_START_ATTRS_CONSTRAINT,
         ),
     )
 
     label: Mapped[str] = mapped_column(String(255))
-    matchesCreation: Mapped[datetime | None] = mapped_column()
-    numberCompetitors: Mapped[int | None] = mapped_column()
-    startingRound: Mapped[int | None] = mapped_column()
+    matches_creation: Mapped[datetime | None] = mapped_column()
+    number_competitors: Mapped[int | None] = mapped_column()
+    starting_round: Mapped[int | None] = mapped_column()
 
     matches: Mapped[list['Match']] = relationship(back_populates='tournament')
 

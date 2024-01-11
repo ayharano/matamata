@@ -35,18 +35,18 @@ def test_start_tournament_for_a_single_competitor(session, tournament, competito
     session.refresh(tournament)
     session.refresh(tournament_competior)
 
-    assert tournament.matchesCreation is not None
-    assert tournament.matchesCreation > before_start_tournament
-    assert tournament.startingRound == 0
-    assert tournament.numberCompetitors == 1
+    assert tournament.matches_creation is not None
+    assert tournament.matches_creation > before_start_tournament
+    assert tournament.starting_round == 0
+    assert tournament.number_competitors == 1
     assert len(matches) == 1
     match = matches[0]
     assert match.round == 0
     assert match.position == 0
-    assert match.competitorA_id is not None
-    assert match.competitorB_id is None
-    assert match.resultRegistration is not None
-    assert match.competitorA_id == match.winner_id
+    assert match.competitor_a_id is not None
+    assert match.competitor_b_id is None
+    assert match.result_registration is not None
+    assert match.competitor_a_id == match.winner_id
     assert match.loser_id is None
     assert tournament_competior.next_match_id is None
 
@@ -73,21 +73,21 @@ def test_start_tournament_for_two_competitors(session, tournament, competitor1, 
     for tournament_competitor in tournament_competitor_dict.values():
         session.refresh(tournament_competitor)
 
-    assert tournament.matchesCreation is not None
-    assert tournament.matchesCreation > before_start_tournament
-    assert tournament.startingRound == 0
-    assert tournament.numberCompetitors == 2
+    assert tournament.matches_creation is not None
+    assert tournament.matches_creation > before_start_tournament
+    assert tournament.starting_round == 0
+    assert tournament.number_competitors == 2
     assert len(matches) == 1
     match = matches[0]
     assert match.round == 0
     assert match.position == 0
-    assert match.competitorA_id in {competitor1.id, competitor2.id}
-    assert {match.competitorB_id} == {competitor1.id, competitor2.id}.difference({match.competitorA_id})
-    assert match.resultRegistration is None
+    assert match.competitor_a_id in {competitor1.id, competitor2.id}
+    assert {match.competitor_b_id} == {competitor1.id, competitor2.id}.difference({match.competitor_a_id})
+    assert match.result_registration is None
     assert match.winner_id is None
     assert match.loser_id is None
-    assert tournament_competitor_dict[matches[0].competitorA_id].next_match_id == matches[0].id
-    assert tournament_competitor_dict[matches[0].competitorB_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_a_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_b_id].next_match_id == matches[0].id
 
 
 def test_start_tournament_for_three_competitors(session, tournament, competitor1, competitor2, competitor3):
@@ -112,53 +112,53 @@ def test_start_tournament_for_three_competitors(session, tournament, competitor1
     for tournament_competitor in tournament_competitor_dict.values():
         session.refresh(tournament_competitor)
 
-    assert tournament.matchesCreation is not None
-    assert tournament.matchesCreation > before_start_tournament
-    assert tournament.startingRound == 1
-    assert tournament.numberCompetitors == 3
+    assert tournament.matches_creation is not None
+    assert tournament.matches_creation > before_start_tournament
+    assert tournament.starting_round == 1
+    assert tournament.number_competitors == 3
     assert len(matches) == 4
 
     # round 1 position 0 has both competitors
     assert matches[0].round == 1
     assert matches[0].position == 0
     remaining_competitor_id_set = {competitor1.id, competitor2.id, competitor3.id}
-    assert matches[0].competitorA_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[0].competitorA_id})
-    assert matches[0].competitorB_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[0].competitorB_id})
-    assert matches[0].resultRegistration is None
+    assert matches[0].competitor_a_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[0].competitor_a_id})
+    assert matches[0].competitor_b_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[0].competitor_b_id})
+    assert matches[0].result_registration is None
     assert matches[0].winner_id is None
     assert matches[0].loser_id is None
-    assert tournament_competitor_dict[matches[0].competitorA_id].next_match_id == matches[0].id
-    assert tournament_competitor_dict[matches[0].competitorB_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_a_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_b_id].next_match_id == matches[0].id
 
     # round 1 position 1 has one competitor, who will compete on the final match
     assert matches[1].round == 1
     assert matches[1].position == 1
-    assert {matches[1].competitorA_id} == remaining_competitor_id_set
-    assert matches[1].competitorB_id is None
-    assert matches[1].resultRegistration is not None
-    assert matches[1].resultRegistration > before_start_tournament
-    assert matches[1].winner_id is matches[1].competitorA_id
+    assert {matches[1].competitor_a_id} == remaining_competitor_id_set
+    assert matches[1].competitor_b_id is None
+    assert matches[1].result_registration is not None
+    assert matches[1].result_registration > before_start_tournament
+    assert matches[1].winner_id is matches[1].competitor_a_id
     assert matches[1].loser_id is None
-    assert tournament_competitor_dict[matches[1].competitorA_id].next_match_id != matches[1].id
+    assert tournament_competitor_dict[matches[1].competitor_a_id].next_match_id != matches[1].id
 
     # round 0 position 0 has one competitor
     assert matches[2].round == 0
     assert matches[2].position == 0
-    assert matches[2].competitorA_id is None
-    assert matches[2].competitorB_id is matches[1].competitorA_id
-    assert matches[2].resultRegistration is None
+    assert matches[2].competitor_a_id is None
+    assert matches[2].competitor_b_id is matches[1].competitor_a_id
+    assert matches[2].result_registration is None
     assert matches[2].winner_id is None
     assert matches[2].loser_id is None
-    assert tournament_competitor_dict[matches[1].competitorA_id].next_match_id == matches[2].id
+    assert tournament_competitor_dict[matches[1].competitor_a_id].next_match_id == matches[2].id
 
     # round 0 position 1 has no competitor
     assert matches[3].round == 0
     assert matches[3].position == 1
-    assert matches[3].competitorA_id is None
-    assert matches[3].competitorB_id is None
-    assert matches[3].resultRegistration is None
+    assert matches[3].competitor_a_id is None
+    assert matches[3].competitor_b_id is None
+    assert matches[3].result_registration is None
     assert matches[3].winner_id is None
     assert matches[3].loser_id is None
 
@@ -185,53 +185,53 @@ def test_start_tournament_for_four_competitors(session, tournament, competitor1,
     for tournament_competitor in tournament_competitor_dict.values():
         session.refresh(tournament_competitor)
 
-    assert tournament.matchesCreation is not None
-    assert tournament.matchesCreation > before_start_tournament
-    assert tournament.startingRound == 1
-    assert tournament.numberCompetitors == 4
+    assert tournament.matches_creation is not None
+    assert tournament.matches_creation > before_start_tournament
+    assert tournament.starting_round == 1
+    assert tournament.number_competitors == 4
     assert len(matches) == 4
 
     # round 1 position 0 has both competitors
     assert matches[0].round == 1
     assert matches[0].position == 0
     remaining_competitor_id_set = {competitor1.id, competitor2.id, competitor3.id, competitor4.id}
-    assert matches[0].competitorA_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[0].competitorA_id})
-    assert matches[0].competitorB_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[0].competitorB_id})
-    assert matches[0].resultRegistration is None
+    assert matches[0].competitor_a_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[0].competitor_a_id})
+    assert matches[0].competitor_b_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[0].competitor_b_id})
+    assert matches[0].result_registration is None
     assert matches[0].winner_id is None
     assert matches[0].loser_id is None
-    assert tournament_competitor_dict[matches[0].competitorA_id].next_match_id == matches[0].id
-    assert tournament_competitor_dict[matches[0].competitorB_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_a_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_b_id].next_match_id == matches[0].id
 
     # round 1 position 1 has both competitors
     assert matches[1].round == 1
     assert matches[1].position == 1
-    assert matches[1].competitorA_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[1].competitorA_id})
-    assert {matches[1].competitorB_id} == remaining_competitor_id_set
-    assert matches[1].resultRegistration is None
+    assert matches[1].competitor_a_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[1].competitor_a_id})
+    assert {matches[1].competitor_b_id} == remaining_competitor_id_set
+    assert matches[1].result_registration is None
     assert matches[1].winner_id is None
     assert matches[1].loser_id is None
-    assert tournament_competitor_dict[matches[1].competitorA_id].next_match_id == matches[1].id
-    assert tournament_competitor_dict[matches[1].competitorB_id].next_match_id == matches[1].id
+    assert tournament_competitor_dict[matches[1].competitor_a_id].next_match_id == matches[1].id
+    assert tournament_competitor_dict[matches[1].competitor_b_id].next_match_id == matches[1].id
 
     # round 0 position 0 has no competitor
     assert matches[2].round == 0
     assert matches[2].position == 0
-    assert matches[2].competitorA_id is None
-    assert matches[2].competitorB_id is None
-    assert matches[2].resultRegistration is None
+    assert matches[2].competitor_a_id is None
+    assert matches[2].competitor_b_id is None
+    assert matches[2].result_registration is None
     assert matches[2].winner_id is None
     assert matches[2].loser_id is None
 
     # round 0 position 1 has no competitor
     assert matches[3].round == 0
     assert matches[3].position == 1
-    assert matches[3].competitorA_id is None
-    assert matches[3].competitorB_id is None
-    assert matches[3].resultRegistration is None
+    assert matches[3].competitor_a_id is None
+    assert matches[3].competitor_b_id is None
+    assert matches[3].result_registration is None
     assert matches[3].winner_id is None
     assert matches[3].loser_id is None
 
@@ -258,96 +258,96 @@ def test_start_tournament_for_five_competitors(session, tournament, competitor1,
     for tournament_competitor in tournament_competitor_dict.values():
         session.refresh(tournament_competitor)
 
-    assert tournament.matchesCreation is not None
-    assert tournament.matchesCreation > before_start_tournament
-    assert tournament.startingRound == 2
-    assert tournament.numberCompetitors == 5
+    assert tournament.matches_creation is not None
+    assert tournament.matches_creation > before_start_tournament
+    assert tournament.starting_round == 2
+    assert tournament.number_competitors == 5
     assert len(matches) == 8
 
     # round 2 position 0 has both competitors
     assert matches[0].round == 2
     assert matches[0].position == 0
     remaining_competitor_id_set = {competitor1.id, competitor2.id, competitor3.id, competitor4.id, competitor5.id}
-    assert matches[0].competitorA_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[0].competitorA_id})
-    assert matches[0].competitorB_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[0].competitorB_id})
-    assert matches[0].resultRegistration is None
+    assert matches[0].competitor_a_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[0].competitor_a_id})
+    assert matches[0].competitor_b_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[0].competitor_b_id})
+    assert matches[0].result_registration is None
     assert matches[0].winner_id is None
     assert matches[0].loser_id is None
-    assert tournament_competitor_dict[matches[0].competitorA_id].next_match_id == matches[0].id
-    assert tournament_competitor_dict[matches[0].competitorB_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_a_id].next_match_id == matches[0].id
+    assert tournament_competitor_dict[matches[0].competitor_b_id].next_match_id == matches[0].id
 
     # round 2 position 1 has one competitor, who will compete on a semifinal match
     assert matches[1].round == 2
     assert matches[1].position == 1
-    assert matches[1].competitorA_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[1].competitorA_id})
-    assert matches[1].competitorB_id is None
-    assert matches[1].resultRegistration is not None
-    assert matches[1].resultRegistration > before_start_tournament
-    assert matches[1].winner_id == matches[1].competitorA_id
+    assert matches[1].competitor_a_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[1].competitor_a_id})
+    assert matches[1].competitor_b_id is None
+    assert matches[1].result_registration is not None
+    assert matches[1].result_registration > before_start_tournament
+    assert matches[1].winner_id == matches[1].competitor_a_id
     assert matches[1].loser_id is None
-    assert tournament_competitor_dict[matches[1].competitorA_id].next_match_id != matches[1].id
+    assert tournament_competitor_dict[matches[1].competitor_a_id].next_match_id != matches[1].id
 
     # round 2 position 2 has one competitor, who will compete on a semifinal match
     assert matches[2].round == 2
     assert matches[2].position == 2
-    assert matches[2].competitorA_id in remaining_competitor_id_set
-    remaining_competitor_id_set.difference_update({matches[2].competitorA_id})
-    assert matches[2].competitorB_id is None
-    assert matches[2].resultRegistration is not None
-    assert matches[2].resultRegistration > before_start_tournament
-    assert matches[2].winner_id == matches[2].competitorA_id
+    assert matches[2].competitor_a_id in remaining_competitor_id_set
+    remaining_competitor_id_set.difference_update({matches[2].competitor_a_id})
+    assert matches[2].competitor_b_id is None
+    assert matches[2].result_registration is not None
+    assert matches[2].result_registration > before_start_tournament
+    assert matches[2].winner_id == matches[2].competitor_a_id
     assert matches[2].loser_id is None
-    assert tournament_competitor_dict[matches[2].competitorA_id].next_match_id != matches[2].id
+    assert tournament_competitor_dict[matches[2].competitor_a_id].next_match_id != matches[2].id
 
     # round 2 position 3 has one competitor, who will compete on a semifinal match
     assert matches[3].round == 2
     assert matches[3].position == 3
-    assert {matches[3].competitorA_id} == remaining_competitor_id_set
-    assert matches[3].competitorB_id is None
-    assert matches[3].resultRegistration is not None
-    assert matches[3].resultRegistration > before_start_tournament
-    assert matches[3].winner_id == matches[3].competitorA_id
+    assert {matches[3].competitor_a_id} == remaining_competitor_id_set
+    assert matches[3].competitor_b_id is None
+    assert matches[3].result_registration is not None
+    assert matches[3].result_registration > before_start_tournament
+    assert matches[3].winner_id == matches[3].competitor_a_id
     assert matches[3].loser_id is None
-    assert tournament_competitor_dict[matches[3].competitorA_id].next_match_id != matches[3].id
+    assert tournament_competitor_dict[matches[3].competitor_a_id].next_match_id != matches[3].id
 
     # round 1 position 0 has one competitor
     assert matches[4].round == 1
     assert matches[4].position == 0
-    assert matches[4].competitorA_id is None
-    assert matches[4].competitorB_id == matches[1].winner_id
-    assert matches[4].resultRegistration is None
+    assert matches[4].competitor_a_id is None
+    assert matches[4].competitor_b_id == matches[1].winner_id
+    assert matches[4].result_registration is None
     assert matches[4].winner_id is None
     assert matches[4].loser_id is None
-    assert tournament_competitor_dict[matches[4].competitorB_id].next_match_id == matches[4].id
+    assert tournament_competitor_dict[matches[4].competitor_b_id].next_match_id == matches[4].id
 
     # round 1 position 1 has two competitors
     assert matches[5].round == 1
     assert matches[5].position == 1
-    assert matches[5].competitorA_id == matches[2].winner_id
-    assert matches[5].competitorB_id == matches[3].winner_id
-    assert matches[5].resultRegistration is None
+    assert matches[5].competitor_a_id == matches[2].winner_id
+    assert matches[5].competitor_b_id == matches[3].winner_id
+    assert matches[5].result_registration is None
     assert matches[5].winner_id is None
     assert matches[5].loser_id is None
-    assert tournament_competitor_dict[matches[5].competitorA_id].next_match_id == matches[5].id
-    assert tournament_competitor_dict[matches[5].competitorB_id].next_match_id == matches[5].id
+    assert tournament_competitor_dict[matches[5].competitor_a_id].next_match_id == matches[5].id
+    assert tournament_competitor_dict[matches[5].competitor_b_id].next_match_id == matches[5].id
 
     # round 0 position 0 has no competitor
     assert matches[6].round == 0
     assert matches[6].position == 0
-    assert matches[6].competitorA_id is None
-    assert matches[6].competitorB_id is None
-    assert matches[6].resultRegistration is None
+    assert matches[6].competitor_a_id is None
+    assert matches[6].competitor_b_id is None
+    assert matches[6].result_registration is None
     assert matches[6].winner_id is None
     assert matches[6].loser_id is None
 
     # round 0 position 1 has no competitor
     assert matches[7].round == 0
     assert matches[7].position == 1
-    assert matches[7].competitorA_id is None
-    assert matches[7].competitorB_id is None
-    assert matches[7].resultRegistration is None
+    assert matches[7].competitor_a_id is None
+    assert matches[7].competitor_b_id is None
+    assert matches[7].result_registration is None
     assert matches[7].winner_id is None
     assert matches[7].loser_id is None

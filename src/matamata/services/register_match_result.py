@@ -35,30 +35,30 @@ def validate_match_to_register_result(
     winner_uuid: UUID,
     session: Session,
 ) -> tuple[Competitor, Competitor]:
-    is_startingRound = (
+    is_starting_round = (
         match_with_tournament_and_competitors.round
         ==
-        match_with_tournament_and_competitors.tournament.startingRound
+        match_with_tournament_and_competitors.tournament.starting_round
     )
 
     competitor_uuid_set: set[UUID] = set()
     map_uuid_to_competitor: dict[UUID, Competitor] = {}
 
-    competitorA_uuid = store_competitor_data(
-        competitor=match_with_tournament_and_competitors.competitorA,
+    competitor_a_uuid = store_competitor_data(
+        competitor=match_with_tournament_and_competitors.competitor_a,
         competitor_uuid_set=competitor_uuid_set,
         map_uuid_to_competitor=map_uuid_to_competitor,
     )
-    competitorB_uuid = store_competitor_data(
-        competitor=match_with_tournament_and_competitors.competitorB,
+    competitor_b_uuid = store_competitor_data(
+        competitor=match_with_tournament_and_competitors.competitor_b,
         competitor_uuid_set=competitor_uuid_set,
         map_uuid_to_competitor=map_uuid_to_competitor,
     )
 
-    has_both_competitors = competitorA_uuid and competitorB_uuid
+    has_both_competitors = competitor_a_uuid and competitor_b_uuid
 
     if not has_both_competitors:
-        if is_startingRound:
+        if is_starting_round:
             raise MatchShouldHaveAutomaticWinner()
         else:
             raise MatchMissingCompetitorFromPreviousMatch()
@@ -73,7 +73,7 @@ def validate_match_to_register_result(
 
     match_with_tournament_and_competitors.winner = winner
     match_with_tournament_and_competitors.loser = loser
-    match_with_tournament_and_competitors.resultRegistration = datetime.utcnow()
+    match_with_tournament_and_competitors.result_registration = datetime.utcnow()
     session.add(match_with_tournament_and_competitors)
 
     return winner, loser
@@ -85,9 +85,9 @@ def get_tournament_id_and_competitor_key(
     tournament_id = match_with_tournament_and_competitors.tournament_id
 
     if match_with_tournament_and_competitors.position % 2 == 0:
-        competitor_key = 'competitorA_id'
+        competitor_key = 'competitor_a_id'
     else:
-        competitor_key = 'competitorB_id'
+        competitor_key = 'competitor_b_id'
 
     return tournament_id, competitor_key
 
@@ -174,14 +174,12 @@ def adjust_third_place_match_for_loser(
         "position": 1,
     }
 
-    loser_next_match_subquery = None
-
     # There is a very specific corner case
     # when the loser of the current match is
     # the third place of a three competitor tournament.
     # This means the loser is an automatic winner of the next match
     is_third_place_out_of_three_competitors = (
-        match_with_tournament_and_competitors.tournament.numberCompetitors == 3
+        match_with_tournament_and_competitors.tournament.number_competitors == 3
     )
 
     loser_next_match_subquery = (
@@ -205,7 +203,7 @@ def adjust_third_place_match_for_loser(
         next_match_id_value = None
         additional_parameters = {
             'winner_id': loser.id,
-            'resultRegistration': datetime.utcnow(),
+            'result_registration': datetime.utcnow(),
         }
 
     update_loser_tournamentcompetitor_next_match = (
@@ -309,7 +307,7 @@ def register_match_result(
     winner_uuid: UUID,
     session: Session,
 ):
-    if match_with_tournament_and_competitors.resultRegistration:
+    if match_with_tournament_and_competitors.result_registration:
         raise MatchAlreadyRegisteredResult()
 
     winner, loser = validate_match_to_register_result(

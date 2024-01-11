@@ -69,7 +69,7 @@ def register_competitor_in_tournament(
     if not tournament:
         raise HTTPException(status_code=404, detail='Target Tournament does not exist')
 
-    if tournament.matchesCreation:
+    if tournament.matches_creation:
         raise HTTPException(
             status_code=409,
             detail='Target Tournament has already created its matches and does not allow new Competitors registration',
@@ -171,7 +171,7 @@ def list_matches_for_competitor_in_tournament(
     )
 
     if not tournament_competitor:
-        if tournament.matchesCreation:
+        if tournament.matches_creation:
             raise HTTPException(
                 status_code=409,
                 detail='Target Competitor is not registered for started target Tournament',
@@ -182,7 +182,7 @@ def list_matches_for_competitor_in_tournament(
                 detail='Target Competitor is not registered for unstarted target Tournament',
             )
 
-    if not tournament.matchesCreation:
+    if not tournament.matches_creation:
         raise HTTPException(
             status_code=422,
             detail='Target Tournament has not created its matches yet',
@@ -193,8 +193,8 @@ def list_matches_for_competitor_in_tournament(
         .where(
             Match.tournament_id == tournament.id,
             (
-                (Match.competitorA_id == competitor.id)
-                | (Match.competitorB_id == competitor.id)
+                (Match.competitor_a_id == competitor.id)
+                | (Match.competitor_b_id == competitor.id)
             )
         )
         .order_by(
@@ -206,14 +206,14 @@ def list_matches_for_competitor_in_tournament(
     bare_past_matches = session.scalars(
         base_match_query
         .where(
-            Match.resultRegistration.is_not(None),
+            Match.result_registration.is_not(None),
             Match.winner_id.is_not(None),
         )
     ).all()
     bare_upcoming_matches = session.scalars(
         base_match_query
         .where(
-            Match.resultRegistration.is_(None),
+            Match.result_registration.is_(None),
             Match.winner_id.is_(None),
         )
     ).all()
@@ -253,7 +253,7 @@ def start_tournament(
     if not tournament:
         raise HTTPException(status_code=404, detail='Target Tournament does not exist')
 
-    if tournament.matchesCreation:
+    if tournament.matches_creation:
         raise HTTPException(
             status_code=409,
             detail='Target Tournament has already created its matches',
@@ -303,7 +303,7 @@ def list_tournament_matches(
     if not tournament:
         raise HTTPException(status_code=404, detail='Target Tournament does not exist')
 
-    if not tournament.matchesCreation:
+    if not tournament.matches_creation:
         raise HTTPException(
             status_code=422,
             detail='Target Tournament has not created its matches yet',
@@ -321,14 +321,14 @@ def list_tournament_matches(
     past_matches_query = (
         base_match_query
         .where(
-            Match.resultRegistration.is_not(None),
+            Match.result_registration.is_not(None),
             Match.winner_id.is_not(None),
         )
     )
     upcoming_matches_query = (
         base_match_query
         .where(
-            Match.resultRegistration.is_(None),
+            Match.result_registration.is_(None),
             Match.winner_id.is_(None),
         )
     )
@@ -358,7 +358,7 @@ def get_tournament_top4(
     if not tournament:
         raise HTTPException(status_code=404, detail='Target Tournament does not exist')
 
-    if not tournament.matchesCreation:
+    if not tournament.matches_creation:
         raise HTTPException(
             status_code=422,
             detail='Target Tournament has not created its matches yet',
@@ -369,7 +369,7 @@ def get_tournament_top4(
         .where(
             Match.tournament_id == tournament.id,
             Match.round == 0,
-            Match.resultRegistration.is_not(None),
+            Match.result_registration.is_not(None),
         )
         .options(
             joinedload(Match.winner),
@@ -381,7 +381,7 @@ def get_tournament_top4(
     ).all()
 
     top4 = [None, None, None, None]
-    if tournament.numberCompetitors <= 2:
+    if tournament.number_competitors <= 2:
         if len(round0_matches) != 1:
             raise HTTPException(
                 status_code=422,

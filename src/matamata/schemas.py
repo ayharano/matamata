@@ -90,16 +90,16 @@ class TournamentCompetitorListSchema(CompetitorListSchema):
 
 
 class TournamentAfterStartSchema(UuidLabelSchema):
-    startingRound: NonNegativeInt
-    numberCompetitors: PositiveInt
+    startingRound: NonNegativeInt = Field(validation_alias='starting_round')
+    numberCompetitors: PositiveInt = Field(validation_alias='number_competitors')
 
 
 class MatchForTournamentListingWithOtherCompetitor(BaseModel):
     uuid: UUID
     round: NonNegativeInt
     position: NonNegativeInt
-    competitorA: CompetitorSchema | None = Field(exclude=True)
-    competitorB: CompetitorSchema | None = Field(exclude=True)
+    competitorA: CompetitorSchema | None = Field(exclude=True, validation_alias='competitor_a')
+    competitorB: CompetitorSchema | None = Field(exclude=True, validation_alias='competitor_b')
     currentCompetitor: CompetitorSchema | None = Field(exclude=True)
 
     @computed_field
@@ -124,8 +124,8 @@ class MatchSchemaForTournamentListing(BaseModel):
     uuid: UUID
     round: NonNegativeInt
     position: NonNegativeInt
-    competitorA: CompetitorSchema | None
-    competitorB: CompetitorSchema | None
+    competitorA: CompetitorSchema | None = Field(validation_alias='competitor_a')
+    competitorB: CompetitorSchema | None = Field(validation_alias='competitor_b')
     winner: CompetitorSchema | None
     loser: CompetitorSchema | None
 

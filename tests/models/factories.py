@@ -22,9 +22,9 @@ class TournamentFactory(TimestampedFactory):
         model = Tournament
 
     label = factory.Faker('company')
-    matchesCreation = None
-    numberCompetitors = None
-    startingRound = None
+    matches_creation = None
+    number_competitors = None
+    starting_round = None
 
 
 class TournamentCompetitorFactory(TimestampedFactory):
@@ -43,10 +43,10 @@ class MatchFactory(TimestampedFactory):
     round = 0
     position = 0
 
-    competitorA = None
-    competitorB = None
+    competitor_a = None
+    competitor_b = None
 
-    resultRegistration = None
+    result_registration = None
 
     winner = None
     loser = None

@@ -91,9 +91,9 @@ def test_404_for_missing_tournament_during_register_competitor_in_tournament(cli
 
 def test_409_for_started_tournament_during_register_competitor_in_tournament(client, session, tournament, competitor):
     # Already started tournament
-    tournament.matchesCreation = datetime(year=2024, month=1, day=1)
-    tournament.numberCompetitors = 1
-    tournament.startingRound = 0
+    tournament.matches_creation = datetime(year=2024, month=1, day=1)
+    tournament.number_competitors = 1
+    tournament.starting_round = 0
     session.add(tournament)
     session.commit()
     session.refresh(tournament)
@@ -213,8 +213,8 @@ def test_list_matches_for_competitor_in_tournament(
 
     past_match = matches[1]
     next_match = matches[2]
-    target_competitor = past_match.competitorB
-    past_match_other_competitor = past_match.competitorA
+    target_competitor = past_match.competitor_b
+    past_match_other_competitor = past_match.competitor_a
 
     assert past_match.round == 1
     assert past_match.position == 1
@@ -564,9 +564,9 @@ def test_404_for_missing_tournament_during_start_tournament(client):
 
 def test_409_for_started_tournament_during_start_tournament(client, session, tournament, competitor):
     # Already started tournament
-    tournament.matchesCreation = datetime(year=2024, month=1, day=1)
-    tournament.numberCompetitors = 1
-    tournament.startingRound = 0
+    tournament.matches_creation = datetime(year=2024, month=1, day=1)
+    tournament.number_competitors = 1
+    tournament.starting_round = 0
     session.add(tournament)
     session.commit()
     session.refresh(tournament)

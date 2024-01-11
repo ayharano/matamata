@@ -117,8 +117,8 @@ def test_tournament_start_schema():
             'tournament': {
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
-                'startingRound': 1,
-                'numberCompetitors': 4
+                'starting_round': 1,
+                'number_competitors': 4
             },
             'competitors': [
                 {
@@ -143,11 +143,11 @@ def test_tournament_start_schema():
                     'uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
                     'round': 1,
                     'position': 0,
-                    'competitorA': {
+                    'competitor_a': {
                         'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                         'label': 'Germany'
                     },
-                    'competitorB': {
+                    'competitor_b': {
                         'uuid': '5d1bd1d1-2679-432a-ac11-ebfebfa1bce9',
                         'label': 'South Korea'
                     },
@@ -158,11 +158,11 @@ def test_tournament_start_schema():
                     'uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'round': 1,
                     'position': 1,
-                    'competitorA': {
+                    'competitor_a': {
                         'uuid': '7f026276-0904-4a7b-ae14-8c66b95ffc9e',
                         'label': 'Brazil'
                     },
-                    'competitorB': {
+                    'competitor_b': {
                         'uuid': '15f4fe33-f317-4c4a-96e0-3b815dc481c6',
                         'label': 'Turkey'
                     },
@@ -173,8 +173,8 @@ def test_tournament_start_schema():
                     'uuid': '1f1fc156-4382-427c-aefb-5ae10009b7ce',
                     'round': 0,
                     'position': 0,
-                    'competitorA': None,
-                    'competitorB': None,
+                    'competitor_a': None,
+                    'competitor_b': None,
                     'winner': None,
                     'loser': None
                 },
@@ -182,8 +182,8 @@ def test_tournament_start_schema():
                     'uuid': 'a9367a16-3f64-408b-9596-4029f7f60e62',
                     'round': 0,
                     'position': 1,
-                    'competitorA': None,
-                    'competitorB': None,
+                    'competitor_a': None,
+                    'competitor_b': None,
                     'winner': None,
                     'loser': None
                 }
@@ -203,19 +203,19 @@ def test_tournament_matches_schema():
             'tournament': {
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
-                'startingRound': 1,
-                'numberCompetitors': 4
+                'starting_round': 1,
+                'number_competitors': 4
             },
             'past': [
                 {
                     'uuid': '1e172084-ec76-4f56-bd8e-7b3c170e1221',
                     'round': 1,
                     'position': 0,
-                    'competitorA': {
+                    'competitor_a': {
                         'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                         'label': 'Germany'
                     },
-                    'competitorB': {
+                    'competitor_b': {
                         'uuid': '5d1bd1d1-2679-432a-ac11-ebfebfa1bce9',
                         'label': 'South Korea'
                     },
@@ -232,11 +232,11 @@ def test_tournament_matches_schema():
                     'uuid': '3866cad6-ba40-44fb-96c6-09f1131c5649',
                     'round': 1,
                     'position': 1,
-                    'competitorA': {
+                    'competitor_a': {
                         'uuid': '7f026276-0904-4a7b-ae14-8c66b95ffc9e',
                         'label': 'Brazil'
                     },
-                    'competitorB': {
+                    'competitor_b': {
                         'uuid': '15f4fe33-f317-4c4a-96e0-3b815dc481c6',
                         'label': 'Turkey'
                     },
@@ -253,11 +253,11 @@ def test_tournament_matches_schema():
                     'uuid': 'a9367a16-3f64-408b-9596-4029f7f60e62',
                     'round': 0,
                     'position': 1,
-                    'competitorA': {
+                    'competitor_a': {
                         'uuid': '5d1bd1d1-2679-432a-ac11-ebfebfa1bce9',
                         'label': 'South Korea'
                     },
-                    'competitorB': {
+                    'competitor_b': {
                         'uuid': '15f4fe33-f317-4c4a-96e0-3b815dc481c6',
                         'label': 'Turkey'
                     },
@@ -276,11 +276,11 @@ def test_tournament_matches_schema():
                     'uuid': '1f1fc156-4382-427c-aefb-5ae10009b7ce',
                     'round': 0,
                     'position': 0,
-                    'competitorA': {
+                    'competitor_a': {
                         'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                         'label': 'Germany'
                     },
-                    'competitorB': {
+                    'competitor_b': {
                         'uuid': '15f4fe33-f317-4c4a-96e0-3b815dc481c6',
                         'label': 'Brazil'
                     },
@@ -304,16 +304,16 @@ def test_match_schema():
             'tournament': {
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
-                'startingRound': 1,
-                'numberCompetitors': 4
+                'starting_round': 1,
+                'number_competitors': 4
             },
             'round': 0,
             'position': 0,
-            'competitorA': {
+            'competitor_a': {
                 'uuid': 'de686e37-804b-4815-a507-d5879a240af6',
                 'label': 'Germany'
             },
-            'competitorB': {
+            'competitor_b': {
                 'uuid': '15f4fe33-f317-4c4a-96e0-3b815dc481c6',
                 'label': 'Brazil'
             },
@@ -344,8 +344,8 @@ def test_tournament_result_schema():
             'tournament': {
                 'uuid': '03c964f8-7f5c-4224-b848-1ab6c1413c7d',
                 'label': '2002 FIFA World Cup',
-                'startingRound': 1,
-                'numberCompetitors': 4
+                'starting_round': 1,
+                'number_competitors': 4
             },
             'top4': [
                 {

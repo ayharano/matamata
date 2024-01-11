@@ -32,8 +32,8 @@ def get_match_detail(
         .where(Match.uuid == match_uuid)
         .options(
             joinedload(Match.tournament),
-            joinedload(Match.competitorA),
-            joinedload(Match.competitorB),
+            joinedload(Match.competitor_a),
+            joinedload(Match.competitor_b),
         )
     )
 
@@ -54,8 +54,8 @@ def register_match_result(
         .where(Match.uuid == match_uuid)
         .options(
             joinedload(Match.tournament),
-            joinedload(Match.competitorA),
-            joinedload(Match.competitorB),
+            joinedload(Match.competitor_a),
+            joinedload(Match.competitor_b),
         )
     )
 

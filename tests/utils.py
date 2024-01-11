@@ -42,8 +42,8 @@ def retrieve_match_with_competitors_by_tournament_round_position(
             Match.position == position,
         )
         .options(
-            joinedload(Match.competitorA),
-            joinedload(Match.competitorB),
+            joinedload(Match.competitor_a),
+            joinedload(Match.competitor_b),
         )
     )
 
@@ -60,8 +60,8 @@ def retrieve_match_with_tournament_and_competitors(
         .where(Match.uuid == match_uuid)
         .options(
             joinedload(Match.tournament),
-            joinedload(Match.competitorA),
-            joinedload(Match.competitorB),
+            joinedload(Match.competitor_a),
+            joinedload(Match.competitor_b),
         )
     )
 

@@ -48,32 +48,32 @@ class Match(IdUuidTimestampedBase):
         ),
         CheckConstraint(
             '('
-            ' competitorA_id IS NULL'
-            ' AND competitorB_id IS NULL'
+            ' competitor_a_id IS NULL'
+            ' AND competitor_b_id IS NULL'
             ') OR ('
-            ' competitorA_id <> competitorB_id'
+            ' competitor_a_id <> competitor_b_id'
             ')',
             name=MATCH_NON_NULL_COMPETITORS_CANNOT_BE_THE_SAME,
         ),
         CheckConstraint(
             '('
-            ' resultRegistration IS NULL'
+            ' result_registration IS NULL'
             ' AND winner_id is NULL'
             ') OR ('
-            ' resultRegistration IS NOT NULL'
+            ' result_registration IS NOT NULL'
             ' AND winner_id IS NOT NULL'
             ')',
             name=MATCH_RESULT_REGISTRATION_MUST_REGISTER_A_WINNER,
         ),
         CheckConstraint(
             '('
-            ' resultRegistration IS NULL'
+            ' result_registration IS NULL'
             ' AND loser_id is NULL'
             ') OR ('
-            ' resultRegistration IS NOT NULL'
+            ' result_registration IS NOT NULL'
             ' AND loser_id is NULL'
             ') OR ('
-            ' resultRegistration IS NOT NULL'
+            ' result_registration IS NOT NULL'
             ' AND loser_id IS NOT NULL'
             ')',
             name=MATCH_RESULT_REGISTRATION_MIGHT_REGISTER_A_LOSER,
@@ -85,12 +85,12 @@ class Match(IdUuidTimestampedBase):
     round: Mapped[int] = mapped_column()
     position: Mapped[int] = mapped_column()
 
-    competitorA_id: Mapped[int | None] = mapped_column(ForeignKey('competitor.id'))
-    competitorB_id: Mapped[int | None] = mapped_column(ForeignKey('competitor.id'))
-    competitorA: Mapped[Optional['Competitor']] = relationship(foreign_keys='Match.competitorA_id')
-    competitorB: Mapped[Optional['Competitor']] = relationship(foreign_keys='Match.competitorB_id')
+    competitor_a_id: Mapped[int | None] = mapped_column(ForeignKey('competitor.id'))
+    competitor_b_id: Mapped[int | None] = mapped_column(ForeignKey('competitor.id'))
+    competitor_a: Mapped[Optional['Competitor']] = relationship(foreign_keys='Match.competitor_a_id')
+    competitor_b: Mapped[Optional['Competitor']] = relationship(foreign_keys='Match.competitor_b_id')
 
-    resultRegistration: Mapped[datetime | None] = mapped_column()
+    result_registration: Mapped[datetime | None] = mapped_column()
 
     winner_id: Mapped[int | None] = mapped_column(ForeignKey('competitor.id'))
     loser_id: Mapped[int | None] = mapped_column(ForeignKey('competitor.id'))
