@@ -21,3 +21,10 @@ recipe also doesn't store the timezone information either.
 Considering the tradeoff of following the deprecation warning and dealing with the comparison between
 [naive and aware timestamps](https://docs.python.org/3.12/library/datetime.html#aware-and-naive-objects),
 we chose to keep using `datetime.datetime.utcnow` for now.
+
+### Using the Project in a Local Environment without Docker Compose
+
+As we replaced the local development setup of the project to relying on the use of
+[Docker Compose](https://docs.docker.com/compose/),
+we have moved and adjusted the previous instructions in
+[a separate document](local_environment_without_docker_compose.md).

@@ -17,7 +17,7 @@ with a descriptive [`index.md file`](./docs/index.md).
 
 [asciinema](https://asciinema.org/) demo from cloning to running the project:
 
-[![*matamata* demo from cloning to running](https://asciinema.org/a/P1gYrv8EC4cBLZB1O5OhxOZEg.svg)](https://asciinema.org/a/P1gYrv8EC4cBLZB1O5OhxOZEg)
+[![*matamata* Docker Compose demo from cloning to running](https://asciinema.org/a/83KC37qmHsZ1d1XMy2VH5gI0n.svg)](https://asciinema.org/a/83KC37qmHsZ1d1XMy2VH5gI0n)
 
 While running the project, it is possible to access the interactive OpenAPI documentation.
 
@@ -29,7 +29,10 @@ This project uses [the twelve-factor app](https://12factor.net/) methodology.
 
 Environment variables in this project can be stored using a `.env` (dot env) file.
 For initial setup, a sample is provided as [`.env.sample`](.env.sample).
-If you prefer to use a `.env` file, copy that sample as `.env` and modify the values accordingly.
+However, because the currently recommended way to run this project in development mode relies on
+[Docker Compose](https://docs.docker.com/compose/),
+it is preferable to adjust the values in
+the [`docker-compose.yml`](docker-compose.yml) file.
 
 A description of each of the variables is provided as the following list.
 
@@ -46,97 +49,114 @@ After cloning the repository, change the directory to the project root.
 All instructions below, including configuring the virtual environment and running the project, depend on being
 in the project root directory.
 
-## Python Version and Virtual Environment Setup
-This project was tested by using CPython 3.12. In order to keep multiple versions of the Python interpreter, we recommend the use of pyenv.
+## Run the project using Docker Compose (recommended way)
 
-- pyenv (Linux, macOS): [link](https://github.com/pyenv/pyenv)
-- pyenv for Windows (Windows): [link](https://pyenv-win.github.io/pyenv-win/)
-
-Once it is installed, we can use the same version as the one used during this project development, which was CPython 3.12.1.
-
-Run the following:
-```shell
-$ pyenv install 3.12.1  # install CPython 3.12.1
-$ pyenv local 3.12.1    # select CPython 3.12.1 as the local interpreter
-```
-
-As a directory name for the virtual env, for this tutorial we will use it as `virtualenvironment`.
-If you prefer another name, just replace all the occurrences from here.
-
-To install a virtual env, run the following:
+After [installing Docker Compose](https://docs.docker.com/compose/install/),
+open a terminal pointing to the project root and run:
 
 ```shell
-$ python -m venv virtualenvironment
+$ docker compose up web
 ```
 
-This way, a directory named `virtualenvironment` will be created at the project root to store the Python project dependencies.
+It will launch the FastAPI app using uvicorn backed by a PostgreSQL instance as the app's
+[RDBMS](https://en.wikipedia.org/wiki/Relational_database).
+This way, we don't need local setup of the project, besides the use of Docker containers.
 
-## Using the local virtual env
+Note that this Docker Compose setup was chosen to facilitate development.
+An actual deployment of the app in a production environment would require some changes.
 
-Regarding the installation and the use of virtual envs, more details can be found at [the `venv` module documentation](https://docs.python.org/3/library/venv.html).
+One of the configurations to facilitate the development process is to
+bind the
+[`migrations`](migrations),
+[`tests`](tests) and
+[source code](src) container directories and
+some project root files to the Docker host filesystem,
+meaning that whenever a change is applied after editing,
+they will be instantly replicated within a running container.
 
-To use the virutal env, the instructions depend on the target operating system:
+### Docker Compose file and Dockerfiles structure
 
-- venv for Linux or macOS
+The [`docker-compose.yml`](docker-compose.yml) file provides four services:
 
-```shell
-$ source virtualenvironment/bin/activate
-```
+1. Test database container (PostgreSQL 16)
+2. App database container (PostgreSQL 16)
+3. Tests container
+4. Web app container
 
-- venv for Windows (PowerShell)
+Tests and Web app containers are built using
+a [multi-stage build](https://docs.docker.com/build/building/multi-stage/)
+strategy in a single [`app.Dockerfile`](app.Dockerfile).
 
-```powershell
-virtualenvironment\Scripts\Activate.ps1
-```
+#### Test Database PostgreSQL container
+The Test Database PostgreSQL container uses an ephemeral volume to
+create the storage only during the test suite running.
 
-## Installing the project dependencies in the virtual env
+#### App Database PostgreSQL container
+The App Database PostgreSQL container uses a local `postgresql-data` volume to
+persist database data between runs.
 
-Once the virtual env is activated, run:
+#### Base container
+The base container prepared in `app.Dockerfile` has
+a non-[root user](https://en.wikipedia.org/wiki/Superuser) on
+a [Debian distro](https://www.debian.org/) instance with
+Python 3.12 configured and provides a
+[virtual environment](https://docs.python.org/3/library/venv.html)
+with some Python package building/installation dependencies.
 
-```shell
-python -m pip install --upgrade pip && python -m pip install --editable '.[test]' && python -m pip install --upgrade tzdata
-```
+Although we don't refer to the base container in the Docker Compose file,
+it is prepared as a base image for other Python-based containers.
 
-This command is a chained call of 3 executions, being
-1. upgrading the local `pip` to its most recent version
-2. installing all the project dependencies, including the ones for testing, and installing the project as [an editable install](https://setuptools.pypa.io/en/latest/userguide/development_mode.html), and
-3. enforce the most recent version of `tzdata`, which is used by Python to manage timezone data without relying on the data from the target operating system (more details at [the `zoneinfo` module documentation](https://docs.python.org/3/library/zoneinfo.html))
+#### Tests container
+The tests container installs Python packages to run the test suite,
+apply the pending migrations in a test database, and
+runs the test suite.
+It binds the project's
+[`migrations`](migrations),
+[`src`](src),
+and
+[`tests`](tests)
+directories, and some project root files within the container.
 
-## Local `.env` file
+We established the successful run of the tests suite a requirement for
+running the Web app container.
 
-As mentioned in [the `Project Configuration` section](#project-configuration), a sample `.env` file is provided as `.env.sample`.
+#### Web app container
+The Web app container installs the required Python packages for the FastAPI app to run,
+apply the pending migrations in an app database, and
+runs the [ASGI](https://asgi.readthedocs.io/) web server `uvicorn` with
+this project application.
+It binds the project's
+[`migrations`](migrations),
+and
+[`src`](src)
+directories, and some project root files within the container.
 
-Currently, it suggests using `DATABASE_URL` value to access a PostgreSQL instance using psycopg with placeholder values of user, password, instance, and database.
 
-Adjust that value accordingly to match your local environment settings.
+### Using the Project in a Local Environment without Docker Compose
+
+As we replaced the local development setup of the project to relying on the use of
+[Docker Compose](https://docs.docker.com/compose/),
+we have moved and adjusted the previous instructions in
+[a separate document](docs/local_environment_without_docker_compose.md).
 
 # Running the test suite
 
-Once all the dependencies are installed, the following command can be issued to run the project test suite:
+Whenever we feel like running the test suite, issue the following command in the project root:
 
 ```shell
-$ pytest --cov=src/matamata .
-```
-
-# Running the database migrations
-
-Before running the application, we need to ensure that all the migrations ran.
-
-Command:
-
-```shell
-$ alembic upgrade head
+$ docker compose up tests
 ```
 
 # Running the application
 
-After all the previous setup was done, we can run the FastAPI `matamata` application.
+To run the FastAPI `matamata` application, issue the following command in the project root:
 
 ```shell
-$ uvicorn matamata.main:app --reload --env-file=.env
+$ docker compose up web
 ```
 
-That command will run the [ASGI](https://asgi.readthedocs.io/) web server `uvicorn` with this project application.
+The Web app container will run the [ASGI](https://asgi.readthedocs.io/) web server `uvicorn` with
+this project application.
 
 By default, it will run on http://127.0.0.1:8000
 
@@ -160,3 +180,8 @@ All the client access can be done in the URL that the server is running as the r
 - [pytest](https://docs.pytest.org/) 7.4
 - [pytest-cov](https://pytest-cov.readthedocs.io/) 4.1
 - [factory_boy](https://factoryboy.readthedocs.io/) 3.3
+
+## Integrated Solution Dependencies
+
+- [PostgreSQL](https://www.postgresql.org/) 16
+- [Docker Compose](https://docs.docker.com/compose/)

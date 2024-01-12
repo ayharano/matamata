@@ -1,0 +1,79 @@
+volumes:
+  postgresql-data:
+
+services:
+  app_database:
+    image: postgres:16
+    restart: always
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_DB: app_db
+      POSTGRES_PASSWORD: app_pw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  test_database:
+    image: postgres:16
+    restart: always
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_DB: test_db
+      POSTGRES_PASSWORD: test_pw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  tests:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+      target: tests
+    command: ./test_entrypoint.sh
+    environment:
+      DATABASE_URL: postgresql+psycopg://test:test_pw@test_database:5432/test_db
+    volumes:
+      - ./alembic.ini:/app/alembic.ini
+      - ./migrations:/app/migrations
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./src:/app/src
+      - ./test_entrypoint.sh:/app/test_entrypoint.sh
+      - ./tests:/app/tests
+    depends_on:
+      test_database:
+        condition: service_healthy
+
+  web:
+    container_name: matamata
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+      target: web
+    command: ./app_entrypoint.sh
+    environment:
+      DATABASE_URL: postgresql+psycopg://app:app_pw@app_database:5432/app_db
+    volumes:
+      - ./alembic.ini:/app/alembic.ini
+      - ./app_entrypoint.sh:/app/app_entrypoint.sh
+      - ./migrations:/app/migrations
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./src:/app/src
+    ports:
+      - "8000:8000"
+    depends_on:
+      app_database:
+        condition: service_healthy
+      tests:
+        condition: service_completed_successfully
