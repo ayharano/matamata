@@ -16,16 +16,16 @@ def test_create_and_retrieve_competitor(session):
     session.add(new_competitor)
     session.commit()
 
-    competitor = session.scalar(
+    competitor_ = session.scalar(
         select(Competitor)
         .where(
             Competitor.label == 'South Korea',
         )
     )
 
-    assert competitor.label == 'South Korea'
-    assert competitor.created > before_new_competitor
-    assert competitor.updated > competitor.created
+    assert competitor_.label == 'South Korea'
+    assert competitor_.created > before_new_competitor
+    assert competitor_.updated > competitor_.created
 
 
 def test_cannot_create_competitor_with_empty_label(session):
