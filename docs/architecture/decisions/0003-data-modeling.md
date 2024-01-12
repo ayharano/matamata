@@ -8,6 +8,8 @@ Proposed
 
 Partially superceded by [5. Removing redundant data relationship](0005-removing-redundant-data-relationship.md)
 
+Partially superceded by [8. Use of PostgreSQL and the Impact Over Previous Data Models](0008-use-of-postgresql-and-the-impact-over-previous-data-models.md)
+
 ## Context
 
 After [the definition of ubiquitous language and the rules that the system will obey](0002-defining-ubiquitous-language.md),

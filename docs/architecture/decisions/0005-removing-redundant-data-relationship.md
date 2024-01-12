@@ -8,6 +8,8 @@ Proposed
 
 Partially supercedes [3. Data Modeling](0003-data-modeling.md)
 
+Partially superceded by [8. Use of PostgreSQL and the Impact Over Previous Data Models](0008-use-of-postgresql-and-the-impact-over-previous-data-models.md)
+
 ## Context
 
 During the implementation phase of the proposed data models, some issues arose.
