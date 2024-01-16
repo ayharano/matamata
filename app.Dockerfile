@@ -55,3 +55,14 @@ RUN pip install --no-cache-dir -e '.' \
  && pip install --no-cache-dir tzdata
 EXPOSE 8000
 CMD ["uvicorn", "--host", "0.0.0.0", "matamata.main:app", "--reload"]
+
+
+FROM base as for_fly
+
+WORKDIR ${APP_HOME}
+COPY --chown=${USER}:${USER} migrations ./migrations/
+COPY --chown=${USER}:${USER} src ./src/
+RUN pip install --no-cache-dir -e '.' \
+ && pip install --no-cache-dir tzdata
+EXPOSE 8080
+CMD ["uvicorn", "--host", "0.0.0.0", "--port", "8080", "matamata.main:app"]
