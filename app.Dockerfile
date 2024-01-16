@@ -45,7 +45,7 @@ FROM base as tests
 WORKDIR ${APP_HOME}
 RUN pip install --no-cache-dir -e '.[test]' \
  && pip install --no-cache-dir tzdata
-CMD ["pytest", "--cov=src", ".", "-vv'"]
+CMD ["pytest", "--cov=src", ".", "-vv"]
 
 
 FROM base as web
@@ -54,4 +54,4 @@ WORKDIR ${APP_HOME}
 RUN pip install --no-cache-dir -e '.' \
  && pip install --no-cache-dir tzdata
 EXPOSE 8000
-CMD ["uvicorn", "--host", "0.0.0.0", "matamata.main:app", "--reload'"]
+CMD ["uvicorn", "--host", "0.0.0.0", "matamata.main:app", "--reload"]
