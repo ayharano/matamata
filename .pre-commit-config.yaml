@@ -1,0 +1,56 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+    -   id: check-added-large-files
+        fail_fast: true
+    -   id: check-ast
+        fail_fast: true
+    -   id: check-case-conflict
+        fail_fast: true
+    -   id: check-merge-conflict
+        fail_fast: true
+    -   id: check-symlinks
+        fail_fast: true
+    -   id: check-toml
+        fail_fast: true
+    -   id: debug-statements
+        fail_fast: true
+    -   id: destroyed-symlinks
+        fail_fast: true
+    -   id: detect-aws-credentials
+        fail_fast: true
+        args: ["--allow-missing-credentials"]
+    -   id: detect-private-key
+        fail_fast: true
+    -   id: end-of-file-fixer
+        fail_fast: true
+    -   id: trailing-whitespace
+        fail_fast: true
+
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+    -   id: black
+        fail_fast: true
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+    -   id: isort
+        fail_fast: true
+        args: ["--profile", "black", "--filter-files"]
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.1.14'
+    hooks:
+    -   id: ruff
+        fail_fast: true
+        args: ["--ignore", "E501"]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+    -   id: bandit
+        fail_fast: true
+        args: ["-ll"]

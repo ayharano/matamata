@@ -49,6 +49,19 @@ After cloning the repository, change the directory to the project root.
 All instructions below, including configuring the virtual environment and running the project, depend on being
 in the project root directory.
 
+## Consistency of contributions using `pre-commit`
+
+To maintain consistency between individual commits,
+this repo is adopting the use of [`pre-commit`](https://pre-commit.com/).
+
+The recommended way to install it for this repo is by installing via [`pipx`](https://pipx.pypa.io/stable/).
+After installing `pipx`, issue the following commands:
+
+```shell
+$ pipx install pre-commit
+$ pre-commit install --install-hooks --overwrite
+```
+
 ## Run the project using Docker Compose (recommended way)
 
 After [installing Docker Compose](https://docs.docker.com/compose/install/),
