@@ -1,0 +1,40 @@
+name: Pre-commit
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo files
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.1'
+
+      - name: set PY for pre-commit
+        run: echo "PY=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+
+      - uses: actions/cache/restore@v4
+        id: pre-commit-cache-restore
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+          fail-on-cache-miss: false
+
+      - name: Setup git config for pre-commit
+        run: git init && git config --global --add safe.directory /__w/lacrei-api/lacrei-api && git add .
+
+      - name: Install pre-commit
+        run: pip install pre-commit && pre-commit install --install-hooks --overwrite
+
+      - uses: actions/cache/save@v4
+        id: pre-commit-cache-save
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run pre-commit all files - fails if adjustments are required
+        run: pre-commit run --all-files

@@ -62,6 +62,8 @@ $ pipx install pre-commit
 $ pre-commit install --install-hooks --overwrite
 ```
 
+`pre-commit` is configured to also run per push and pull requests in GitHub workflow.
+
 ## Run the project using Docker Compose (recommended way)
 
 After [installing Docker Compose](https://docs.docker.com/compose/install/),
