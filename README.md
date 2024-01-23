@@ -166,8 +166,8 @@ All the client access can be done in the URL that the server is running as the r
 
 # Project Dependencies
 - [Python](https://www.python.org/) 3.12+
-- [uvicorn](https://www.uvicorn.org/) 0.25+
-- [FastAPI](https://fastapi.tiangolo.com/) 0.108+
+- [uvicorn](https://www.uvicorn.org/) 0.27+
+- [FastAPI](https://fastapi.tiangolo.com/) 0.109+
 - [Pydantic Settings](https://docs.pydantic.dev/2.5/concepts/pydantic_settings/) 2.1
 
 ## Database Dependencies

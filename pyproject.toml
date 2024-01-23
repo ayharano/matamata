@@ -17,8 +17,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "uvicorn[standard] >=0.25.0,<1",
-    "fastapi[all] >=0.108.0,<1",
+    "uvicorn[standard] >=0.27.0,<1",
+    "fastapi[all] >=0.109.0,<1",
     "pydantic-settings >=2.1.0,<2.2",
     "sqlalchemy >=2.0.25,<2.1",
     "sqlalchemy-utils >=0.41.1,<0.42",
