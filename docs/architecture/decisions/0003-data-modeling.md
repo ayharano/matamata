@@ -86,7 +86,7 @@ erDiagram
         int finalMatch FK "Reference to the final match"
         int thirdPlaceMatch FK "Reference to the third place match"
     }
-    
+
     Match {
         int id PK "Internal identifier"
         uuid uuid UK "External identifier using UUID"
@@ -103,13 +103,13 @@ erDiagram
         int winner FK "Reference to the winner competitor"
         int loser FK "Reference to the loser competitor"
     }
-    
+
     TournamentCompetitor {
         int tournament PK, FK
         int competitor PK, FK
         timestamp created "Internal timestamp to track an instance creation"
         timestamp updated "Internal timestamp to track an instance creation"
-        int nextMatch FK "Reference to the next match the competitor will compete in the tournament" 
+        int nextMatch FK "Reference to the next match the competitor will compete in the tournament"
     }
 
     Competitor only one -- zero or more TournamentCompetitor : is

@@ -11,24 +11,26 @@ def strip_string(raw: str) -> str:
 
 
 def non_empty_trimmed_string(trimmed: str) -> str:
-    if trimmed == '':
-        raise ValueError('must not be empty or contain only whitespace characters')
+    if trimmed == "":
+        raise ValueError("must not be empty or contain only whitespace characters")
     return trimmed
 
 
 TrimmedString = Annotated[str, AfterValidator(strip_string)]
-NonEmptyTrimmedString = Annotated[TrimmedString, AfterValidator(non_empty_trimmed_string)]
+NonEmptyTrimmedString = Annotated[
+    TrimmedString, AfterValidator(non_empty_trimmed_string)
+]
 
 
 def non_negative(value: int) -> int:
     if value < 0:
-        raise ValueError('must not a non-negative value')
+        raise ValueError("must not a non-negative value")
     return value
 
 
 def positive(value: int) -> int:
     if value <= 0:
-        raise ValueError('must not a positive value')
+        raise ValueError("must not a positive value")
     return value
 
 
@@ -90,16 +92,20 @@ class TournamentCompetitorListSchema(CompetitorListSchema):
 
 
 class TournamentAfterStartSchema(UuidLabelSchema):
-    startingRound: NonNegativeInt = Field(validation_alias='starting_round')
-    numberCompetitors: PositiveInt = Field(validation_alias='number_competitors')
+    startingRound: NonNegativeInt = Field(validation_alias="starting_round")
+    numberCompetitors: PositiveInt = Field(validation_alias="number_competitors")
 
 
 class MatchForTournamentListingWithOtherCompetitor(BaseModel):
     uuid: UUID
     round: NonNegativeInt
     position: NonNegativeInt
-    competitorA: CompetitorSchema | None = Field(exclude=True, validation_alias='competitor_a')
-    competitorB: CompetitorSchema | None = Field(exclude=True, validation_alias='competitor_b')
+    competitorA: CompetitorSchema | None = Field(
+        exclude=True, validation_alias="competitor_a"
+    )
+    competitorB: CompetitorSchema | None = Field(
+        exclude=True, validation_alias="competitor_b"
+    )
     currentCompetitor: CompetitorSchema | None = Field(exclude=True)
 
     @computed_field
@@ -124,8 +130,8 @@ class MatchSchemaForTournamentListing(BaseModel):
     uuid: UUID
     round: NonNegativeInt
     position: NonNegativeInt
-    competitorA: CompetitorSchema | None = Field(validation_alias='competitor_a')
-    competitorB: CompetitorSchema | None = Field(validation_alias='competitor_b')
+    competitorA: CompetitorSchema | None = Field(validation_alias="competitor_a")
+    competitorB: CompetitorSchema | None = Field(validation_alias="competitor_b")
     winner: CompetitorSchema | None
     loser: CompetitorSchema | None
 

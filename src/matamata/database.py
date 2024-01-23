@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from matamata.settings import settings
 
-
 engine = create_engine(settings.DATABASE_URL)
 
 

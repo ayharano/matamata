@@ -5,16 +5,14 @@ from sqlalchemy.exc import IntegrityError
 
 from matamata.models import Match
 from matamata.models.constants import (
-    MATCH_TOURNAMENT_ROUND_POSITION_UNIQUE_CONSTRAINT,
-    MATCH_ROUND_CONSTRAINT,
-    MATCH_POSITION_CONSTRAINT,
-    MATCH_ROUND_POSITION_CONSTRAINT,
     MATCH_NON_NULL_COMPETITORS_CANNOT_BE_THE_SAME,
+    MATCH_POSITION_CONSTRAINT,
     MATCH_RESULT_REGISTRATION_MUST_REGISTER_A_WINNER,
+    MATCH_ROUND_CONSTRAINT,
+    MATCH_ROUND_POSITION_CONSTRAINT,
+    MATCH_TOURNAMENT_ROUND_POSITION_UNIQUE_CONSTRAINT,
 )
-from tests.utils import (
-    retrieve_match_with_competitors_by_tournament_round_position,
-)
+from tests.utils import retrieve_match_with_competitors_by_tournament_round_position
 
 
 def test_create_and_retrieve_match(session, tournament, competitor1, competitor2):
@@ -75,7 +73,9 @@ def test_cannot_create_duplicate_match(session, tournament, competitor1, competi
         session.commit()
 
 
-def test_match_round_must_be_non_negative(session, tournament, competitor1, competitor2):
+def test_match_round_must_be_non_negative(
+    session, tournament, competitor1, competitor2
+):
     match = Match(
         tournament_id=tournament.id,
         round=-1,
@@ -92,7 +92,9 @@ def test_match_round_must_be_non_negative(session, tournament, competitor1, comp
         session.commit()
 
 
-def test_match_position_must_be_non_negative(session, tournament, competitor1, competitor2):
+def test_match_position_must_be_non_negative(
+    session, tournament, competitor1, competitor2
+):
     match = Match(
         tournament_id=tournament.id,
         round=0,
@@ -109,7 +111,9 @@ def test_match_position_must_be_non_negative(session, tournament, competitor1, c
         session.commit()
 
 
-def test_match_position_cannot_be_greater_or_equal_round_power_2(session, tournament, competitor1, competitor2):
+def test_match_position_cannot_be_greater_or_equal_round_power_2(
+    session, tournament, competitor1, competitor2
+):
     match = Match(
         tournament_id=tournament.id,
         round=1,
@@ -180,7 +184,9 @@ def test_match_resultregistration_must_register_winner(session, tournament, comp
         session.commit()
 
 
-def test_tournament_can_access_matches(session, tournament, competitor, competitor1, competitor2):
+def test_tournament_can_access_matches(
+    session, tournament, competitor, competitor1, competitor2
+):
     final_match = Match(
         tournament_id=tournament.id,
         round=0,

@@ -7,7 +7,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from matamata.database import get_session
-from matamata.models import Match, Tournament, TournamentCompetitor, Competitor
+from matamata.models import Competitor, Match, Tournament, TournamentCompetitor
 
 
 def calculate_tournament_parameters(competitors: Sized) -> tuple[int, int, int]:
@@ -18,17 +18,17 @@ def calculate_tournament_parameters(competitors: Sized) -> tuple[int, int, int]:
         number_of_entry_matches = 1
     else:
         starting_round = int(floor(log2(number_of_competitors - 1)))
-        number_of_entry_matches = 2 ** starting_round
+        number_of_entry_matches = 2**starting_round
 
     return number_of_competitors, starting_round, number_of_entry_matches
 
 
 def calculate_match_index(*, starting_round, match_round, match_position):
     if match_round > starting_round:
-        raise ValueError('invalid round values combination')
+        raise ValueError("invalid round values combination")
 
     if match_position >= 2**match_round:
-        raise ValueError('invalid round/position values combination')
+        raise ValueError("invalid round/position values combination")
 
     offset = 0
     for current_round in range(starting_round, match_round, -1):
@@ -47,9 +47,7 @@ def process_automatic_winning(
         number_of_competitors,
         starting_round,
         number_of_entry_matches,
-    ) = calculate_tournament_parameters(
-        map_competitor_next_match_index
-    )
+    ) = calculate_tournament_parameters(map_competitor_next_match_index)
 
     if number_of_competitors // 2 == number_of_entry_matches:
         # No automatic winning
@@ -57,13 +55,13 @@ def process_automatic_winning(
 
     for match_index in range(number_of_entry_matches):
         current_match = match_data[match_index]
-        if 'competitor_b' in current_match:
+        if "competitor_b" in current_match:
             continue
         # automatic winning found
-        competitor = current_match['competitor_a']
+        competitor = current_match["competitor_a"]
         current_match |= {
-            'result_registration': datetime.utcnow(),
-            'winner': competitor,
+            "result_registration": datetime.utcnow(),
+            "winner": competitor,
         }
 
         # need to set competitor as next match competitor
@@ -82,7 +80,9 @@ def process_automatic_winning(
         )
 
         next_match_data = match_data[next_match_index_in_match_data]
-        next_match_key_name = 'competitor_a' if next_match_competitor_index == 0 else 'competitor_b'
+        next_match_key_name = (
+            "competitor_a" if next_match_competitor_index == 0 else "competitor_b"
+        )
         next_match_data[next_match_key_name] = competitor
         map_competitor_next_match_index[competitor] = next_match_index_in_match_data
 
@@ -97,9 +97,9 @@ def prepare_match_data_as_list_of_dict(
     # We populate entry matches, then intermediate matches and final and third place matches last
     match_data = [
         {
-            'tournament_id': tournament.id,
-            'round': round_,
-            'position': position,
+            "tournament_id": tournament.id,
+            "round": round_,
+            "position": position,
         }
         for round_ in range(starting_round, -1, -1)
         for position in range(2**round_)
@@ -107,7 +107,7 @@ def prepare_match_data_as_list_of_dict(
 
     if number_of_competitors > 2:
         # The only match that doesn't follow the previous rule is the third place match
-        match_data.append({'round': 0, 'position': 1})
+        match_data.append({"round": 0, "position": 1})
 
     return match_data
 
@@ -135,7 +135,7 @@ def inline_random_pair_of_entry_match_competitors(
     for index, competitor in enumerate(shuffled_competitors):
         competitor_index, match_index = divmod(index, number_of_entry_matches)
 
-        key_name = 'competitor_a' if competitor_index == 0 else 'competitor_b'
+        key_name = "competitor_a" if competitor_index == 0 else "competitor_b"
         match_data[match_index][key_name] = competitor
         map_competitor_next_match_index[competitor] = match_index
 
@@ -148,10 +148,7 @@ def insert_and_refresh_match_data_as_match_instances(
     starting_round: int,
     session: Session,
 ) -> list[Match]:
-    new_matches = [
-        Match(**current_match_data)
-        for current_match_data in match_data
-    ]
+    new_matches = [Match(**current_match_data) for current_match_data in match_data]
     tournament.matches.extend(new_matches)
     tournament.matches_creation = datetime.utcnow()
     tournament.number_competitors = number_of_competitors
@@ -191,8 +188,7 @@ def start_tournament(
         raise ValueError("No competitors to start tournament")
 
     map_competitor_association = {
-        association.competitor: association
-        for association in competitor_associations
+        association.competitor: association for association in competitor_associations
     }
     map_competitor_next_match_index: dict[Competitor, int | None] = {}
 
@@ -209,7 +205,7 @@ def start_tournament(
         starting_round=starting_round,
         number_of_competitors=number_of_competitors,
     )
-    
+
     inline_random_pair_of_entry_match_competitors(
         competitors=map_competitor_association,
         number_of_entry_matches=number_of_entry_matches,

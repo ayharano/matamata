@@ -12,7 +12,7 @@ from .tournament_competitor import TournamentCompetitor
 
 @generic_repr
 class Competitor(IdUuidTimestampedBase):
-    __tablename__ = 'competitor'
+    __tablename__ = "competitor"
     __table_args__ = (
         CheckConstraint(
             "NOT(TRIM(label) LIKE '')",
@@ -23,15 +23,15 @@ class Competitor(IdUuidTimestampedBase):
     label: Mapped[str] = mapped_column(String(255))
 
     tournament_associations: Mapped[list[TournamentCompetitor]] = relationship(
-        cascade='all, delete-orphan',
-        overlaps='competitor',
+        cascade="all, delete-orphan",
+        overlaps="competitor",
     )
-    tournaments: AssociationProxy[list['Tournament']] = association_proxy(
-        'tournament_associations',
-        'tournament',
+    tournaments: AssociationProxy[list["Tournament"]] = association_proxy(  # noqa: F821
+        "tournament_associations",
+        "tournament",
         creator=lambda tournament_: TournamentCompetitor(tournament=tournament_),
     )
-    next_matches: AssociationProxy[list['Match']] = association_proxy(
-        'tournament_associations',
-        'next_match',
+    next_matches: AssociationProxy[list["Match"]] = association_proxy(  # noqa: F821
+        "tournament_associations",
+        "next_match",
     )

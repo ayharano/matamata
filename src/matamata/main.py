@@ -3,12 +3,9 @@ from fastapi import FastAPI
 from . import __version__ as VERSION
 from .routers import competitor, match, tournament
 
-
 app = FastAPI(
-    title='matamata',
-    summary=(
-        'REST API for single-elimination tournament management'
-    ),
+    title="matamata",
+    summary=("REST API for single-elimination tournament management"),
     version=VERSION,
 )
 

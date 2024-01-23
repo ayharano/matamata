@@ -1,20 +1,20 @@
 from datetime import datetime
 
 from matamata.models import Match
-from tests.utils import (
-    retrieve_tournament_competitor,
-    start_tournament_util,
-)
+from tests.utils import retrieve_tournament_competitor, start_tournament_util
 
+BASE_URL = "/match"
 
-BASE_URL = '/match'
-
-GET_MATCH_DETAIL_URL_TEMPLATE = BASE_URL + '/{match_uuid}'
-REGISTER_MATCH_RESULT_URL_TEMPLATE = BASE_URL + '/{match_uuid}'
+GET_MATCH_DETAIL_URL_TEMPLATE = BASE_URL + "/{match_uuid}"
+REGISTER_MATCH_RESULT_URL_TEMPLATE = BASE_URL + "/{match_uuid}"
 
 
 def test_200_for_get_match_detail_with_result_not_registered_yet(
-    session, client, tournament, competitor1, competitor2,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
 ):
     for competitor_ in [competitor1, competitor2]:
         tournament.competitors.append(competitor_)
@@ -44,30 +44,33 @@ def test_200_for_get_match_detail_with_result_not_registered_yet(
 
     assert response.status_code == 200
     assert response.json() == {
-        'uuid': str(final.uuid),
-        'round': 0,
-        'position': 0,
-        'competitorA': {
-            'uuid': str(final.competitor_a.uuid),
-            'label': final.competitor_a.label,
+        "uuid": str(final.uuid),
+        "round": 0,
+        "position": 0,
+        "competitorA": {
+            "uuid": str(final.competitor_a.uuid),
+            "label": final.competitor_a.label,
         },
-        'competitorB': {
-            'uuid': str(final.competitor_b.uuid),
-            'label': final.competitor_b.label,
+        "competitorB": {
+            "uuid": str(final.competitor_b.uuid),
+            "label": final.competitor_b.label,
         },
-        'winner': None,
-        'loser': None,
-        'tournament': {
-            'uuid': str(tournament.uuid),
-            'label': tournament.label,
-            'numberCompetitors': tournament.number_competitors,
-            'startingRound': tournament.starting_round,
+        "winner": None,
+        "loser": None,
+        "tournament": {
+            "uuid": str(tournament.uuid),
+            "label": tournament.label,
+            "numberCompetitors": tournament.number_competitors,
+            "startingRound": tournament.starting_round,
         },
     }
 
 
 def test_200_for_get_match_detail_with_result_registered_with_one_competitor_only(
-    session, client, tournament, competitor,
+    session,
+    client,
+    tournament,
+    competitor,
 ):
     tournament.competitors.append(competitor)
     session.add(tournament)
@@ -96,24 +99,24 @@ def test_200_for_get_match_detail_with_result_registered_with_one_competitor_onl
 
     assert response.status_code == 200
     assert response.json() == {
-        'uuid': str(final.uuid),
-        'round': 0,
-        'position': 0,
-        'competitorA': {
-            'uuid': str(competitor.uuid),
-            'label': competitor.label,
+        "uuid": str(final.uuid),
+        "round": 0,
+        "position": 0,
+        "competitorA": {
+            "uuid": str(competitor.uuid),
+            "label": competitor.label,
         },
-        'competitorB': None,
-        'winner': {
-            'uuid': str(competitor.uuid),
-            'label': competitor.label,
+        "competitorB": None,
+        "winner": {
+            "uuid": str(competitor.uuid),
+            "label": competitor.label,
         },
-        'loser': None,
-        'tournament': {
-            'uuid': str(tournament.uuid),
-            'label': tournament.label,
-            'numberCompetitors': tournament.number_competitors,
-            'startingRound': tournament.starting_round,
+        "loser": None,
+        "tournament": {
+            "uuid": str(tournament.uuid),
+            "label": tournament.label,
+            "numberCompetitors": tournament.number_competitors,
+            "startingRound": tournament.starting_round,
         },
     }
 
@@ -121,18 +124,22 @@ def test_200_for_get_match_detail_with_result_registered_with_one_competitor_onl
 def test_404_for_missing_match_during_get_match_detail(client, competitor):
     response = client.get(
         GET_MATCH_DETAIL_URL_TEMPLATE.format(
-            match_uuid='01234567-89ab-cdef-0123-456789abcdef',
+            match_uuid="01234567-89ab-cdef-0123-456789abcdef",
         ),
     )
 
     assert response.status_code == 404
     assert response.json() == {
-        'detail': 'Target Match does not exist',
+        "detail": "Target Match does not exist",
     }
 
 
 def test_200_for_register_match_result_for_final_match(
-    session, client, tournament, competitor1, competitor2,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
 ):
     for competitor_ in [competitor1, competitor2]:
         tournament.competitors.append(competitor_)
@@ -174,36 +181,36 @@ def test_200_for_register_match_result_for_final_match(
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=final.uuid),
         json={
-            'winner_uuid': str(final.competitor_b.uuid),
+            "winner_uuid": str(final.competitor_b.uuid),
         },
     )
 
     assert response.status_code == 200
     assert response.json() == {
-        'uuid': str(final.uuid),
-        'round': 0,
-        'position': 0,
-        'competitorA': {
-            'uuid': str(final.competitor_a.uuid),
-            'label': final.competitor_a.label,
+        "uuid": str(final.uuid),
+        "round": 0,
+        "position": 0,
+        "competitorA": {
+            "uuid": str(final.competitor_a.uuid),
+            "label": final.competitor_a.label,
         },
-        'competitorB': {
-            'uuid': str(final.competitor_b.uuid),
-            'label': final.competitor_b.label,
+        "competitorB": {
+            "uuid": str(final.competitor_b.uuid),
+            "label": final.competitor_b.label,
         },
-        'winner': {
-            'uuid': str(final.competitor_b.uuid),
-            'label': final.competitor_b.label,
+        "winner": {
+            "uuid": str(final.competitor_b.uuid),
+            "label": final.competitor_b.label,
         },
-        'loser': {
-            'uuid': str(final.competitor_a.uuid),
-            'label': final.competitor_a.label,
+        "loser": {
+            "uuid": str(final.competitor_a.uuid),
+            "label": final.competitor_a.label,
         },
-        'tournament': {
-            'uuid': str(tournament.uuid),
-            'label': tournament.label,
-            'numberCompetitors': tournament.number_competitors,
-            'startingRound': tournament.starting_round,
+        "tournament": {
+            "uuid": str(tournament.uuid),
+            "label": tournament.label,
+            "numberCompetitors": tournament.number_competitors,
+            "startingRound": tournament.starting_round,
         },
     }
 
@@ -216,7 +223,12 @@ def test_200_for_register_match_result_for_final_match(
 
 
 def test_200_for_register_match_result_for_semifinal_match_for_three_competitors(
-    session, client, tournament, competitor1, competitor2, competitor3,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
+    competitor3,
 ):
     for competitor_ in [competitor1, competitor2, competitor3]:
         tournament.competitors.append(competitor_)
@@ -271,36 +283,36 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=semifinal_r1p0.uuid),
         json={
-            'winner_uuid': str(semifinal_r1p0.competitor_b.uuid),
+            "winner_uuid": str(semifinal_r1p0.competitor_b.uuid),
         },
     )
 
     assert response.status_code == 200
     assert response.json() == {
-        'uuid': str(semifinal_r1p0.uuid),
-        'round': 1,
-        'position': 0,
-        'competitorA': {
-            'uuid': str(semifinal_r1p0.competitor_a.uuid),
-            'label': semifinal_r1p0.competitor_a.label,
+        "uuid": str(semifinal_r1p0.uuid),
+        "round": 1,
+        "position": 0,
+        "competitorA": {
+            "uuid": str(semifinal_r1p0.competitor_a.uuid),
+            "label": semifinal_r1p0.competitor_a.label,
         },
-        'competitorB': {
-            'uuid': str(semifinal_r1p0.competitor_b.uuid),
-            'label': semifinal_r1p0.competitor_b.label,
+        "competitorB": {
+            "uuid": str(semifinal_r1p0.competitor_b.uuid),
+            "label": semifinal_r1p0.competitor_b.label,
         },
-        'winner': {
-            'uuid': str(semifinal_r1p0.competitor_b.uuid),
-            'label': semifinal_r1p0.competitor_b.label,
+        "winner": {
+            "uuid": str(semifinal_r1p0.competitor_b.uuid),
+            "label": semifinal_r1p0.competitor_b.label,
         },
-        'loser': {
-            'uuid': str(semifinal_r1p0.competitor_a.uuid),
-            'label': semifinal_r1p0.competitor_a.label,
+        "loser": {
+            "uuid": str(semifinal_r1p0.competitor_a.uuid),
+            "label": semifinal_r1p0.competitor_a.label,
         },
-        'tournament': {
-            'uuid': str(tournament.uuid),
-            'label': tournament.label,
-            'numberCompetitors': tournament.number_competitors,
-            'startingRound': tournament.starting_round,
+        "tournament": {
+            "uuid": str(tournament.uuid),
+            "label": tournament.label,
+            "numberCompetitors": tournament.number_competitors,
+            "startingRound": tournament.starting_round,
         },
     }
 
@@ -319,9 +331,22 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
 
 
 def test_200_for_register_match_result_for_round_1_match(
-    session, client, tournament, competitor1, competitor2, competitor3, competitor4, competitor5,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
+    competitor3,
+    competitor4,
+    competitor5,
 ):
-    for competitor_ in [competitor1, competitor2, competitor3, competitor4, competitor5]:
+    for competitor_ in [
+        competitor1,
+        competitor2,
+        competitor3,
+        competitor4,
+        competitor5,
+    ]:
         tournament.competitors.append(competitor_)
         session.add(tournament)
     session.commit()
@@ -371,36 +396,36 @@ def test_200_for_register_match_result_for_round_1_match(
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=semifinal_r1p1.uuid),
         json={
-            'winner_uuid': str(semifinal_r1p1.competitor_a.uuid),
+            "winner_uuid": str(semifinal_r1p1.competitor_a.uuid),
         },
     )
 
     assert response.status_code == 200
     assert response.json() == {
-        'uuid': str(semifinal_r1p1.uuid),
-        'round': 1,
-        'position': 1,
-        'competitorA': {
-            'uuid': str(semifinal_r1p1.competitor_a.uuid),
-            'label': semifinal_r1p1.competitor_a.label,
+        "uuid": str(semifinal_r1p1.uuid),
+        "round": 1,
+        "position": 1,
+        "competitorA": {
+            "uuid": str(semifinal_r1p1.competitor_a.uuid),
+            "label": semifinal_r1p1.competitor_a.label,
         },
-        'competitorB': {
-            'uuid': str(semifinal_r1p1.competitor_b.uuid),
-            'label': semifinal_r1p1.competitor_b.label,
+        "competitorB": {
+            "uuid": str(semifinal_r1p1.competitor_b.uuid),
+            "label": semifinal_r1p1.competitor_b.label,
         },
-        'winner': {
-            'uuid': str(semifinal_r1p1.competitor_a.uuid),
-            'label': semifinal_r1p1.competitor_a.label,
+        "winner": {
+            "uuid": str(semifinal_r1p1.competitor_a.uuid),
+            "label": semifinal_r1p1.competitor_a.label,
         },
-        'loser': {
-            'uuid': str(semifinal_r1p1.competitor_b.uuid),
-            'label': semifinal_r1p1.competitor_b.label,
+        "loser": {
+            "uuid": str(semifinal_r1p1.competitor_b.uuid),
+            "label": semifinal_r1p1.competitor_b.label,
         },
-        'tournament': {
-            'uuid': str(tournament.uuid),
-            'label': tournament.label,
-            'numberCompetitors': tournament.number_competitors,
-            'startingRound': tournament.starting_round,
+        "tournament": {
+            "uuid": str(tournament.uuid),
+            "label": tournament.label,
+            "numberCompetitors": tournament.number_competitors,
+            "startingRound": tournament.starting_round,
         },
     }
 
@@ -417,9 +442,22 @@ def test_200_for_register_match_result_for_round_1_match(
 
 
 def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
-    session, client, tournament, competitor1, competitor2, competitor3, competitor4, competitor5,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
+    competitor3,
+    competitor4,
+    competitor5,
 ):
-    for competitor_ in [competitor1, competitor2, competitor3, competitor4, competitor5]:
+    for competitor_ in [
+        competitor1,
+        competitor2,
+        competitor3,
+        competitor4,
+        competitor5,
+    ]:
         tournament.competitors.append(competitor_)
         session.add(tournament)
     session.commit()
@@ -464,36 +502,36 @@ def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=entry_match.uuid),
         json={
-            'winner_uuid': str(entry_match.competitor_a.uuid),
+            "winner_uuid": str(entry_match.competitor_a.uuid),
         },
     )
 
     assert response.status_code == 200
     assert response.json() == {
-        'uuid': str(entry_match.uuid),
-        'round': 2,
-        'position': 0,
-        'competitorA': {
-            'uuid': str(entry_match.competitor_a.uuid),
-            'label': entry_match.competitor_a.label,
+        "uuid": str(entry_match.uuid),
+        "round": 2,
+        "position": 0,
+        "competitorA": {
+            "uuid": str(entry_match.competitor_a.uuid),
+            "label": entry_match.competitor_a.label,
         },
-        'competitorB': {
-            'uuid': str(entry_match.competitor_b.uuid),
-            'label': entry_match.competitor_b.label,
+        "competitorB": {
+            "uuid": str(entry_match.competitor_b.uuid),
+            "label": entry_match.competitor_b.label,
         },
-        'winner': {
-            'uuid': str(entry_match.competitor_a.uuid),
-            'label': entry_match.competitor_a.label,
+        "winner": {
+            "uuid": str(entry_match.competitor_a.uuid),
+            "label": entry_match.competitor_a.label,
         },
-        'loser': {
-            'uuid': str(entry_match.competitor_b.uuid),
-            'label': entry_match.competitor_b.label,
+        "loser": {
+            "uuid": str(entry_match.competitor_b.uuid),
+            "label": entry_match.competitor_b.label,
         },
-        'tournament': {
-            'uuid': str(tournament.uuid),
-            'label': tournament.label,
-            'numberCompetitors': tournament.number_competitors,
-            'startingRound': tournament.starting_round,
+        "tournament": {
+            "uuid": str(tournament.uuid),
+            "label": tournament.label,
+            "numberCompetitors": tournament.number_competitors,
+            "startingRound": tournament.starting_round,
         },
     }
 
@@ -511,20 +549,22 @@ def test_200_for_register_match_result_for_round_greater_than_1_entry_match(
 def test_404_for_missing_match_during_register_match_result(client, competitor):
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(
-            match_uuid='01234567-89ab-cdef-0123-456789abcdef',
+            match_uuid="01234567-89ab-cdef-0123-456789abcdef",
         ),
         json={
-            'winner_uuid': str(competitor.uuid),
+            "winner_uuid": str(competitor.uuid),
         },
     )
 
     assert response.status_code == 404
     assert response.json() == {
-        'detail': 'Target Match does not exist',
+        "detail": "Target Match does not exist",
     }
 
 
-def test_409_for_match_with_registered_result_during_register_match_result(client, session, tournament, competitor):
+def test_409_for_match_with_registered_result_during_register_match_result(
+    client, session, tournament, competitor
+):
     tournament.matchesCreation = datetime(year=2024, month=1, day=1)
     tournament.numberCompetitors = 1
     tournament.startingRound = 0
@@ -545,17 +585,19 @@ def test_409_for_match_with_registered_result_during_register_match_result(clien
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=final_match.uuid),
         json={
-            'winner_uuid': str(competitor.uuid),
+            "winner_uuid": str(competitor.uuid),
         },
     )
 
     assert response.status_code == 409
     assert response.json() == {
-        'detail': 'Target Match has already registered its result',
+        "detail": "Target Match has already registered its result",
     }
 
 
-def test_409_for_match_that_should_have_automatic_winner_during_register_match_result(client, session, tournament, competitor):
+def test_409_for_match_that_should_have_automatic_winner_during_register_match_result(
+    client, session, tournament, competitor
+):
     tournament.matches_creation = datetime(year=2024, month=1, day=1)
     tournament.number_competitors = 1
     tournament.starting_round = 0
@@ -574,17 +616,19 @@ def test_409_for_match_that_should_have_automatic_winner_during_register_match_r
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=final_match.uuid),
         json={
-            'winner_uuid': str(competitor.uuid),
+            "winner_uuid": str(competitor.uuid),
         },
     )
 
     assert response.status_code == 409
     assert response.json() == {
-        'detail': 'Target Match should have elected an automatic winner',
+        "detail": "Target Match should have elected an automatic winner",
     }
 
 
-def test_422_for_missing_competitor_during_register_match_result(client, session, tournament, competitor1, competitor2, competitor3):
+def test_422_for_missing_competitor_during_register_match_result(
+    client, session, tournament, competitor1, competitor2, competitor3
+):
     tournament.matchesCreation = datetime(year=2024, month=1, day=1)
     tournament.numberCompetitors = 3
     tournament.startingRound = 1
@@ -603,20 +647,22 @@ def test_422_for_missing_competitor_during_register_match_result(client, session
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=final_match.uuid),
         json={
-            'winner_uuid': str(competitor3.uuid),
+            "winner_uuid": str(competitor3.uuid),
         },
     )
 
     assert response.status_code == 422
     assert response.json() == {
-        'detail': (
-            'Target Match is not ready to register a result due to'
-            ' registered previous Matches but missing Competitor'
+        "detail": (
+            "Target Match is not ready to register a result due to"
+            " registered previous Matches but missing Competitor"
         )
     }
 
 
-def test_409_for_competitor_not_match_competitor_during_register_match_result(client, session, tournament, competitor1, competitor2, competitor3):
+def test_409_for_competitor_not_match_competitor_during_register_match_result(
+    client, session, tournament, competitor1, competitor2, competitor3
+):
     tournament.matchesCreation = datetime(year=2024, month=1, day=1)
     tournament.numberCompetitors = 3
     tournament.startingRound = 1
@@ -637,11 +683,11 @@ def test_409_for_competitor_not_match_competitor_during_register_match_result(cl
     response = client.post(
         REGISTER_MATCH_RESULT_URL_TEMPLATE.format(match_uuid=final_match.uuid),
         json={
-            'winner_uuid': str(competitor3.uuid),
+            "winner_uuid": str(competitor3.uuid),
         },
     )
 
     assert response.status_code == 409
     assert response.json() == {
-        'detail': 'Target Competitor is not a target Match competitor',
+        "detail": "Target Competitor is not a target Match competitor",
     }

@@ -18,7 +18,11 @@ from tests.utils import (
 
 
 def test_register_match_result_for_final_match(
-    session, client, tournament, competitor1, competitor2,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
 ):
     for competitor_ in [competitor1, competitor2]:
         tournament.competitors.append(competitor_)
@@ -79,7 +83,12 @@ def test_register_match_result_for_final_match(
 
 
 def test_200_for_register_match_result_for_semifinal_match_for_three_competitors(
-    session, client, tournament, competitor1, competitor2, competitor3,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
+    competitor3,
 ):
     for competitor_ in [competitor1, competitor2, competitor3]:
         tournament.competitors.append(competitor_)
@@ -159,9 +168,22 @@ def test_200_for_register_match_result_for_semifinal_match_for_three_competitors
 
 
 def test_register_match_result_for_round_1_match(
-    session, client, tournament, competitor1, competitor2, competitor3, competitor4, competitor5,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
+    competitor3,
+    competitor4,
+    competitor5,
 ):
-    for competitor_ in [competitor1, competitor2, competitor3, competitor4, competitor5]:
+    for competitor_ in [
+        competitor1,
+        competitor2,
+        competitor3,
+        competitor4,
+        competitor5,
+    ]:
         tournament.competitors.append(competitor_)
         session.add(tournament)
     session.commit()
@@ -235,9 +257,22 @@ def test_register_match_result_for_round_1_match(
 
 
 def test_register_match_result_for_round_greater_than_1_entry_match(
-    session, client, tournament, competitor1, competitor2, competitor3, competitor4, competitor5,
+    session,
+    client,
+    tournament,
+    competitor1,
+    competitor2,
+    competitor3,
+    competitor4,
+    competitor5,
 ):
-    for competitor_ in [competitor1, competitor2, competitor3, competitor4, competitor5]:
+    for competitor_ in [
+        competitor1,
+        competitor2,
+        competitor3,
+        competitor4,
+        competitor5,
+    ]:
         tournament.competitors.append(competitor_)
         session.add(tournament)
     session.commit()
@@ -305,7 +340,9 @@ def test_register_match_result_for_round_greater_than_1_entry_match(
     assert tournament_competitor_competitor_b.next_match_id is None
 
 
-def test_match_with_registered_result_during_register_match_result(client, session, tournament, competitor):
+def test_match_with_registered_result_during_register_match_result(
+    client, session, tournament, competitor
+):
     tournament.matches_creation = datetime(year=2024, month=1, day=1)
     tournament.number_competitors = 1
     tournament.starting_round = 0
@@ -336,7 +373,9 @@ def test_match_with_registered_result_during_register_match_result(client, sessi
         )
 
 
-def test_match_that_should_have_automatic_winner_during_register_match_result(client, session, tournament, competitor):
+def test_match_that_should_have_automatic_winner_during_register_match_result(
+    client, session, tournament, competitor
+):
     tournament.matches_creation = datetime(year=2024, month=1, day=1)
     tournament.number_competitors = 1
     tournament.starting_round = 0
@@ -365,7 +404,9 @@ def test_match_that_should_have_automatic_winner_during_register_match_result(cl
         )
 
 
-def test_missing_competitor_during_register_match_result(client, session, tournament, competitor1, competitor2, competitor3):
+def test_missing_competitor_during_register_match_result(
+    client, session, tournament, competitor1, competitor2, competitor3
+):
     tournament.matches_creation = datetime(year=2024, month=1, day=1)
     tournament.number_competitors = 3
     tournament.starting_round = 1
@@ -394,7 +435,9 @@ def test_missing_competitor_during_register_match_result(client, session, tourna
         )
 
 
-def test_competitor_not_match_competitor_during_register_match_result(client, session, tournament, competitor1, competitor2, competitor3):
+def test_competitor_not_match_competitor_during_register_match_result(
+    client, session, tournament, competitor1, competitor2, competitor3
+):
     tournament.matches_creation = datetime(year=2024, month=1, day=1)
     tournament.number_competitors = 3
     tournament.starting_round = 1

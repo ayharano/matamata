@@ -1,10 +1,14 @@
-COMPETITOR_LABEL_CONSTRAINT = 'competitor_label_not_empty_nor_whitespace_only'
-MATCH_ROUND_CONSTRAINT = 'match_round_non_negative'
-MATCH_ROUND_POSITION_CONSTRAINT = 'match_round_position_values'
-MATCH_POSITION_CONSTRAINT = 'match_position_non_negative'
-MATCH_TOURNAMENT_ROUND_POSITION_UNIQUE_CONSTRAINT = 'match_tournament_round_position_unique'
-MATCH_NON_NULL_COMPETITORS_CANNOT_BE_THE_SAME = 'match_non_null_competitors_cannot_be_the_same'
-MATCH_RESULT_REGISTRATION_MUST_REGISTER_A_WINNER = 'match_result_registration_winner'
-MATCH_RESULT_REGISTRATION_MIGHT_REGISTER_A_LOSER = 'match_result_registration_loser'
-TOURNAMENT_LABEL_CONSTRAINT = 'tournament_label_not_empty_nor_whitespace_only'
-TOURNAMENT_START_ATTRS_CONSTRAINT = 'tournament_all_null_or_all_set_under_conditions'
+COMPETITOR_LABEL_CONSTRAINT = "competitor_label_not_empty_nor_whitespace_only"
+MATCH_ROUND_CONSTRAINT = "match_round_non_negative"
+MATCH_ROUND_POSITION_CONSTRAINT = "match_round_position_values"
+MATCH_POSITION_CONSTRAINT = "match_position_non_negative"
+MATCH_TOURNAMENT_ROUND_POSITION_UNIQUE_CONSTRAINT = (
+    "match_tournament_round_position_unique"
+)
+MATCH_NON_NULL_COMPETITORS_CANNOT_BE_THE_SAME = (
+    "match_non_null_competitors_cannot_be_the_same"
+)
+MATCH_RESULT_REGISTRATION_MUST_REGISTER_A_WINNER = "match_result_registration_winner"
+MATCH_RESULT_REGISTRATION_MIGHT_REGISTER_A_LOSER = "match_result_registration_loser"
+TOURNAMENT_LABEL_CONSTRAINT = "tournament_label_not_empty_nor_whitespace_only"
+TOURNAMENT_START_ATTRS_CONSTRAINT = "tournament_all_null_or_all_set_under_conditions"

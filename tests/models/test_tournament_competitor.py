@@ -18,8 +18,7 @@ def test_create_and_retrieve_tournamentcompetitor(session, competitor, tournamen
     session.commit()
 
     tournament_competitor = session.scalar(
-        select(TournamentCompetitor)
-        .where(
+        select(TournamentCompetitor).where(
             TournamentCompetitor.tournament == tournament,
         )
     )
@@ -51,14 +50,16 @@ def test_cannot_create_duplicate_tournament_competitor(session, competitor, tour
         session.commit()
 
 
-def test_tournament_can_access_competitors(session, tournament, competitor1, competitor2):
+def test_tournament_can_access_competitors(
+    session, tournament, competitor1, competitor2
+):
     tournament.competitors.append(competitor1)
     tournament.competitors.append(competitor2)
     session.commit()
     session.refresh(tournament)
 
     count = session.scalar(
-        select(func.count('*'))
+        select(func.count("*"))
         .select_from(TournamentCompetitor)
         .where(
             TournamentCompetitor.tournament == tournament,
@@ -70,14 +71,16 @@ def test_tournament_can_access_competitors(session, tournament, competitor1, com
     assert tournament.competitors == [competitor1, competitor2]
 
 
-def test_competitor_can_access_tournaments(session, competitor, tournament1, tournament2):
+def test_competitor_can_access_tournaments(
+    session, competitor, tournament1, tournament2
+):
     competitor.tournaments.append(tournament1)
     competitor.tournaments.append(tournament2)
     session.commit()
     session.refresh(competitor)
 
     count = session.scalar(
-        select(func.count('*'))
+        select(func.count("*"))
         .select_from(TournamentCompetitor)
         .where(
             TournamentCompetitor.competitor == competitor,

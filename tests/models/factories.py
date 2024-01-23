@@ -14,14 +14,14 @@ class CompetitorFactory(TimestampedFactory):
     class Meta:
         model = Competitor
 
-    label = factory.Faker('name')
+    label = factory.Faker("name")
 
 
 class TournamentFactory(TimestampedFactory):
     class Meta:
         model = Tournament
 
-    label = factory.Faker('company')
+    label = factory.Faker("company")
     matches_creation = None
     number_competitors = None
     starting_round = None

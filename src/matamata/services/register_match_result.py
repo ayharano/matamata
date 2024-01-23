@@ -4,13 +4,14 @@ from uuid import UUID
 from sqlalchemy import Update, select, update
 from sqlalchemy.orm import Session
 
+from matamata.models import Competitor, Match, TournamentCompetitor
+
 from .exceptions import (
     MatchAlreadyRegisteredResult,
     MatchMissingCompetitorFromPreviousMatch,
     MatchShouldHaveAutomaticWinner,
     MatchTargetCompetitorIsNotMatchCompetitor,
 )
-from matamata.models import Competitor, Match, TournamentCompetitor
 
 
 def store_competitor_data(
@@ -37,8 +38,7 @@ def validate_match_to_register_result(
 ) -> tuple[Competitor, Competitor]:
     is_starting_round = (
         match_with_tournament_and_competitors.round
-        ==
-        match_with_tournament_and_competitors.tournament.starting_round
+        == match_with_tournament_and_competitors.tournament.starting_round
     )
 
     competitor_uuid_set: set[UUID] = set()
@@ -85,9 +85,9 @@ def get_tournament_id_and_competitor_key(
     tournament_id = match_with_tournament_and_competitors.tournament_id
 
     if match_with_tournament_and_competitors.position % 2 == 0:
-        competitor_key = 'competitor_a_id'
+        competitor_key = "competitor_a_id"
     else:
-        competitor_key = 'competitor_b_id'
+        competitor_key = "competitor_b_id"
 
     return tournament_id, competitor_key
 
@@ -114,8 +114,8 @@ def update_winner_next_match_data(
             select(Match.id)
             .where(
                 Match.tournament_id == tournament_id,
-                Match.round == winner_next_match_parameters['round'],
-                Match.position == winner_next_match_parameters['position'],
+                Match.round == winner_next_match_parameters["round"],
+                Match.position == winner_next_match_parameters["position"],
             )
             .scalar_subquery()
         )
@@ -186,8 +186,8 @@ def adjust_third_place_match_for_loser(
         select(Match.id)
         .where(
             Match.tournament_id == tournament_id,
-            Match.round == loser_next_match_parameters['round'],
-            Match.position == loser_next_match_parameters['position'],
+            Match.round == loser_next_match_parameters["round"],
+            Match.position == loser_next_match_parameters["position"],
         )
         .scalar_subquery()
     )
@@ -202,8 +202,8 @@ def adjust_third_place_match_for_loser(
         # it is an automatic winner of the next match
         next_match_id_value = None
         additional_parameters = {
-            'winner_id': loser.id,
-            'result_registration': datetime.utcnow(),
+            "winner_id": loser.id,
+            "result_registration": datetime.utcnow(),
         }
 
     update_loser_tournamentcompetitor_next_match = (
@@ -226,7 +226,8 @@ def adjust_third_place_match_for_loser(
             **(
                 {
                     competitor_key: loser.id,
-                } | additional_parameters
+                }
+                | additional_parameters
             )
         )
     )
@@ -261,9 +262,7 @@ def update_loser_next_match_data(
     update_loser_next_match_competitor = None
 
     # There will be a next match if the current match was a semifinal one
-    will_compete_third_place_match = (
-        match_with_tournament_and_competitors.round == 1
-    )
+    will_compete_third_place_match = match_with_tournament_and_competitors.round == 1
 
     if will_compete_third_place_match:
         (

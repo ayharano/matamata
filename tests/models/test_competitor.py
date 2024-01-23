@@ -11,26 +11,25 @@ from matamata.models.constants import COMPETITOR_LABEL_CONSTRAINT
 def test_create_and_retrieve_competitor(session):
     before_new_competitor = datetime.utcnow()
     new_competitor = Competitor(
-        label='South Korea',
+        label="South Korea",
     )
     session.add(new_competitor)
     session.commit()
 
     competitor_ = session.scalar(
-        select(Competitor)
-        .where(
-            Competitor.label == 'South Korea',
+        select(Competitor).where(
+            Competitor.label == "South Korea",
         )
     )
 
-    assert competitor_.label == 'South Korea'
+    assert competitor_.label == "South Korea"
     assert competitor_.created > before_new_competitor
     assert competitor_.updated > competitor_.created
 
 
 def test_cannot_create_competitor_with_empty_label(session):
     empty_label_competitor = Competitor(
-        label='',  # empty
+        label="",  # empty
     )
     session.add(empty_label_competitor)
     with pytest.raises(
@@ -42,7 +41,7 @@ def test_cannot_create_competitor_with_empty_label(session):
 
 def test_cannot_create_competitor_with_whitespace_only_label(session):
     whitespace_label_competitor = Competitor(
-        label='  ',  # whitespaces
+        label="  ",  # whitespaces
     )
     session.add(whitespace_label_competitor)
     with pytest.raises(
@@ -54,24 +53,24 @@ def test_cannot_create_competitor_with_whitespace_only_label(session):
 
 def test_can_create_duplicate_competitor(session):
     first_competitor = Competitor(
-        label='Brazil',
+        label="Brazil",
     )
     session.add(first_competitor)
     session.commit()
     session.refresh(first_competitor)
 
     second_competitor = Competitor(
-        label='Brazil',
+        label="Brazil",
     )
     session.add(second_competitor)
     session.commit()
     session.refresh(second_competitor)
 
     count = session.scalar(
-        select(func.count('*'))
+        select(func.count("*"))
         .select_from(Competitor)
         .where(
-            Competitor.label == 'Brazil',
+            Competitor.label == "Brazil",
         )
     )
 

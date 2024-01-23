@@ -4,10 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from matamata.models import Match, Tournament, TournamentCompetitor
-from matamata.services import (
-    register_match_result as register_match_result_service,
-    start_tournament as start_tournament_service,
-)
+from matamata.services import register_match_result as register_match_result_service
+from matamata.services import start_tournament as start_tournament_service
 
 
 def retrieve_tournament_competitor(
@@ -17,8 +15,7 @@ def retrieve_tournament_competitor(
     session: Session,
 ) -> TournamentCompetitor:
     tournament_competitor = session.scalar(
-        select(TournamentCompetitor)
-        .where(
+        select(TournamentCompetitor).where(
             TournamentCompetitor.tournament_id == tournament_id,
             TournamentCompetitor.competitor_id == competitor_id,
         )
@@ -77,8 +74,9 @@ def retrieve_tournament_with_competitors(
         select(Tournament)
         .where(Tournament.uuid == tournament_uuid)
         .options(
-            joinedload(Tournament.competitor_associations)
-            .subqueryload(TournamentCompetitor.competitor)
+            joinedload(Tournament.competitor_associations).subqueryload(
+                TournamentCompetitor.competitor
+            )
         )
     )
 

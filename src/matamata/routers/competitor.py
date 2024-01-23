@@ -13,11 +13,10 @@ from matamata.schemas import (
     CompetitorSchema,
 )
 
+router = APIRouter(prefix="/competitor", tags=["competitor"])
 
-router = APIRouter(prefix='/competitor', tags=['competitor'])
 
-
-@router.post('/', response_model=CompetitorSchema, status_code=201)
+@router.post("/", response_model=CompetitorSchema, status_code=201)
 def create_competitor(
     competitor_payload: CompetitorPayloadSchema,
     session: Session = Depends(get_session),
@@ -32,33 +31,32 @@ def create_competitor(
     return competitor
 
 
-@router.get('/', response_model=CompetitorListSchema, status_code=200)
+@router.get("/", response_model=CompetitorListSchema, status_code=200)
 def list_competitors(
     session: Session = Depends(get_session),
 ):
-    competitors = session.scalars(
-        select(Competitor)
-    ).all()
+    competitors = session.scalars(select(Competitor)).all()
 
     data = {
-        'competitors': competitors,
+        "competitors": competitors,
     }
 
     return data
 
 
-@router.get('/{competitor_uuid}', response_model=CompetitorDetailSchema, status_code=200)
+@router.get(
+    "/{competitor_uuid}", response_model=CompetitorDetailSchema, status_code=200
+)
 def get_competitor_data(
     competitor_uuid: UUID,
     session: Session = Depends(get_session),
 ):
     competitor = session.scalar(
-        select(Competitor)
-        .where(Competitor.uuid == competitor_uuid)
+        select(Competitor).where(Competitor.uuid == competitor_uuid)
     )
 
     if not competitor:
-        raise HTTPException(status_code=404, detail='Target Competitor does not exist')
+        raise HTTPException(status_code=404, detail="Target Competitor does not exist")
 
     base_tournament_query = (
         select(Tournament)
@@ -67,25 +65,16 @@ def get_competitor_data(
         .where(TournamentCompetitor.competitor_id == competitor.id)
     )
 
-    past_tournaments_query = (
-        base_tournament_query
-        .where(
-            Tournament.starting_round.is_not(None),
-            TournamentCompetitor.next_match_id.is_(None),
-        )
+    past_tournaments_query = base_tournament_query.where(
+        Tournament.starting_round.is_not(None),
+        TournamentCompetitor.next_match_id.is_(None),
     )
-    ongoing_tournaments_query = (
-        base_tournament_query
-        .where(
-            Tournament.starting_round.is_not(None),
-            TournamentCompetitor.next_match_id.is_not(None),
-        )
+    ongoing_tournaments_query = base_tournament_query.where(
+        Tournament.starting_round.is_not(None),
+        TournamentCompetitor.next_match_id.is_not(None),
     )
-    upcoming_tournaments_query = (
-        base_tournament_query
-        .where(
-            Tournament.starting_round.is_(None),
-        )
+    upcoming_tournaments_query = base_tournament_query.where(
+        Tournament.starting_round.is_(None),
     )
 
     past_tournaments = session.scalars(past_tournaments_query).all()
@@ -93,12 +82,12 @@ def get_competitor_data(
     upcoming_tournaments = session.scalars(upcoming_tournaments_query).all()
 
     data = {
-        'competitor': competitor,
-        'tournaments': {
-            'past': past_tournaments,
-            'ongoing': ongoing_tournaments,
-            'upcoming': upcoming_tournaments,
-        }
+        "competitor": competitor,
+        "tournaments": {
+            "past": past_tournaments,
+            "ongoing": ongoing_tournaments,
+            "upcoming": upcoming_tournaments,
+        },
     }
 
     return data

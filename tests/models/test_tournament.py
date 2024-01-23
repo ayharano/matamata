@@ -5,26 +5,28 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
 from matamata.models import Tournament
-from matamata.models.constants import TOURNAMENT_LABEL_CONSTRAINT, TOURNAMENT_START_ATTRS_CONSTRAINT
+from matamata.models.constants import (
+    TOURNAMENT_LABEL_CONSTRAINT,
+    TOURNAMENT_START_ATTRS_CONSTRAINT,
+)
 from matamata.models.exceptions import CannotUpdateTournamentDataAfterStartError
 
 
 def test_create_and_retrieve_tournament(session):
     before_new_tournament = datetime.utcnow()
     new_tournament = Tournament(
-        label='2022 FIFA World Cup',
+        label="2022 FIFA World Cup",
     )
     session.add(new_tournament)
     session.commit()
 
     tournament_ = session.scalar(
-        select(Tournament)
-        .where(
-            Tournament.label == '2022 FIFA World Cup',
+        select(Tournament).where(
+            Tournament.label == "2022 FIFA World Cup",
         )
     )
 
-    assert tournament_.label == '2022 FIFA World Cup'
+    assert tournament_.label == "2022 FIFA World Cup"
     assert tournament_.created > before_new_tournament
     assert tournament_.updated > tournament_.created
     assert tournament_.matches_creation is None
@@ -34,7 +36,7 @@ def test_create_and_retrieve_tournament(session):
 
 def test_cannot_create_tournament_with_empty_label(session):
     empty_label_tournament = Tournament(
-        label='',  # empty
+        label="",  # empty
     )
     session.add(empty_label_tournament)
     with pytest.raises(
@@ -46,7 +48,7 @@ def test_cannot_create_tournament_with_empty_label(session):
 
 def test_cannot_create_tournament_with_whitespace_only_label(session):
     whitespace_label_tournament = Tournament(
-        label='  ',  # whitespaces
+        label="  ",  # whitespaces
     )
     session.add(whitespace_label_tournament)
     with pytest.raises(
@@ -58,33 +60,35 @@ def test_cannot_create_tournament_with_whitespace_only_label(session):
 
 def test_can_create_duplicate_tournament(session):
     first_tournament = Tournament(
-        label='2022 FIFA World Cup',
+        label="2022 FIFA World Cup",
     )
     session.add(first_tournament)
     session.commit()
     session.refresh(first_tournament)
 
     second_tournament = Tournament(
-        label='2022 FIFA World Cup',
+        label="2022 FIFA World Cup",
     )
     session.add(second_tournament)
     session.commit()
     session.refresh(second_tournament)
 
     count = session.scalar(
-        select(func.count('*'))
+        select(func.count("*"))
         .select_from(Tournament)
         .where(
-            Tournament.label == '2022 FIFA World Cup',
+            Tournament.label == "2022 FIFA World Cup",
         )
     )
 
     assert count == 2
 
 
-def test_tournament_matches_creation_must_be_non_null_with_positive_number_competitors(session):
+def test_tournament_matches_creation_must_be_non_null_with_positive_number_competitors(
+    session,
+):
     tournament_ = Tournament(
-        label='2022 FIFA World Cup',
+        label="2022 FIFA World Cup",
     )
     session.add(tournament_)
     session.commit()
@@ -124,7 +128,7 @@ def test_tournament_matches_creation_must_be_non_null_with_positive_number_compe
 
 def test_tournament_does_not_allow_changing_attrs_after_start(session):
     tournament_ = Tournament(
-        label='2022 FIFA World Cup',
+        label="2022 FIFA World Cup",
     )
     session.add(tournament_)
     session.commit()
@@ -143,7 +147,7 @@ def test_tournament_does_not_allow_changing_attrs_after_start(session):
     session.add(tournament_)
     with pytest.raises(
         CannotUpdateTournamentDataAfterStartError,
-        match='matches_creation is not allowed to be updated after Tournament start',
+        match="matches_creation is not allowed to be updated after Tournament start",
     ):
         session.commit()
     session.rollback()
@@ -154,7 +158,7 @@ def test_tournament_does_not_allow_changing_attrs_after_start(session):
     session.add(tournament_)
     with pytest.raises(
         CannotUpdateTournamentDataAfterStartError,
-        match='number_competitors is not allowed to be updated after Tournament start',
+        match="number_competitors is not allowed to be updated after Tournament start",
     ):
         session.commit()
     session.rollback()
@@ -165,7 +169,7 @@ def test_tournament_does_not_allow_changing_attrs_after_start(session):
     session.add(tournament_)
     with pytest.raises(
         CannotUpdateTournamentDataAfterStartError,
-        match='starting_round is not allowed to be updated after Tournament start',
+        match="starting_round is not allowed to be updated after Tournament start",
     ):
         session.commit()
     session.rollback()
